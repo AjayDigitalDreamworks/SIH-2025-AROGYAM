@@ -5,40 +5,45 @@ const { cloudinary } = require('../config/cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const Video = require('../models/Hub');
 
-// Set up two separate storages
-const videoStorage = new CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: 'videos',
-    resource_type: 'video'
+  params: async (req, file) => {
+    if (file.mimetype.startsWith('video/')) {
+      return {
+        folder: 'videos',
+        resource_type: 'video'
+      };
+    } else if (file.mimetype.startsWith('image/')) {
+      return {
+        folder: 'thumbnails',
+        resource_type: 'image'
+      };
+    } else {
+      throw new Error('Unsupported file type');
+    }
   }
 });
 
-const imageStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'thumbnails',
-    resource_type: 'image'
-  }
+const upload = multer({ storage });
+
+// Middleware to handle both files
+const uploadFiles = upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]);
+
+// Render upload form
+router.get('/upload', (req, res) => {
+  res.render('upload', { msg: "" });
 });
-
-// Combine storages into fields
-const videoUpload = multer({ storage: videoStorage });
-const imageUpload = multer({ storage: imageStorage });
-
-// Middleware to handle both uploads
-const uploadFiles = [
-  videoUpload.single('video'),
-  imageUpload.single('thumbnail')
-];
 
 // Upload route
 router.post('/upload', uploadFiles, async (req, res) => {
   try {
     const { title, category, duration, rating, description, tags } = req.body;
 
-    const videoUrl = req.files?.video?.[0]?.path || req.file?.path;
-    const thumbnailUrl = req.files?.thumbnail?.[0]?.path || req.file?.path;
+    const videoUrl = req.files?.video?.[0]?.path;
+    const thumbnailUrl = req.files?.thumbnail?.[0]?.path;
 
     const video = new Video({
       title,
@@ -47,8 +52,8 @@ router.post('/upload', uploadFiles, async (req, res) => {
       rating,
       description,
       tags: tags.split(',').map(tag => tag.trim()),
-      videoUrl: req?.files?.video?.[0]?.path || req?.file?.path,
-      thumbnailUrl: req?.files?.thumbnail?.[0]?.path || req?.file?.path
+      videoUrl,
+      thumbnailUrl
     });
 
     await video.save();
@@ -59,31 +64,32 @@ router.post('/upload', uploadFiles, async (req, res) => {
   }
 });
 
-
-
-// View all videos
+//  View all videos
 router.get('/', async (req, res) => {
   try {
     const videos = await Video.find();
-    const guides = [];      // Add this if you plan to return guides
-    const exercises = [];   // Add this if you plan to return exercises
+    const guides = [];
+    const exercises = [];
 
-    res.json({
-      videos,
-      guides,
-      exercises
-    });
+    // Optional: use JSON API or render view
+    res.json({ videos, guides, exercises });
+
+    // If rendering:
+    // res.render('hub', { videos });
   } catch (error) {
     console.error("Failed to fetch resources:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-// Watch video
+// Watch video route
 router.get('/watch/:id', async (req, res) => {
-  const video = await Video.findById(req.params.id);
-  res.render('watch', { video });
+  try {
+    const video = await Video.findById(req.params.id);
+    res.render('watch', { video });
+  } catch (err) {
+    res.status(404).json({ error: 'Video not found' });
+  }
 });
 
 module.exports = router;
