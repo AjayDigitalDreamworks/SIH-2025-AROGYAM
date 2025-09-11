@@ -22,7 +22,7 @@ import {
   X
 } from "lucide-react";
 
-const cloudinaryBase = "https://res.cloudinary.com/<cloud_name>/video/upload/";
+const cloudinaryBase = "";
 
 export default function Resources() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +42,7 @@ export default function Resources() {
     const fetchResources = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/hub/'); // Replace with actual API URL
+        const response = await axios.get('http://localhost:3000/hub/'); // Replace with actual API URL
         const data = response.data;
 
         // Safe fallback in case any key is missing
