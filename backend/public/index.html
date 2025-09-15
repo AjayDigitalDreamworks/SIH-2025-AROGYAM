@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Volunteer Dashboard</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, button, select { width: 100%; padding: 8px; margin: 5px 0; }
+    .chat-box { border: 1px solid #ccc; height: 200px; overflow-y: scroll; padding: 10px; margin-top: 10px; background: #f8f8f8; }
+    .msg { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>🧑‍🚀 Volunteer Login</h2>
+  <input id="email" placeholder="Email" type="email">
+  <input id="password" placeholder="Password" type="password">
+  <button onclick="login()">Login</button>
+
+  <div id="dashboard" style="display: none;">
+    <h3>Welcome, <span id="alias"></span></h3>
+    <img id="avatar" src="" width="50" height="50" />
+
+    <div id="community-section">
+      <h3>Communities</h3>
+      <select id="communitySelect"></select>
+      <button onclick="joinCommunity()">Join Selected</button>
+    </div>
+
+    <div id="create-section" style="display: none;">
+      <h4>Create Community</h4>
+      <input id="newCommunityName" placeholder="Community name">
+      <button onclick="createCommunity()">Create</button>
+    </div>
+
+    <div id="chat-section" style="display: none;">
+      <h4>Chat</h4>
+      <div class="chat-box" id="chatBox"></div>
+      <input id="msg" placeholder="Type message">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    let token = '';
+    let socket = null;
+    let currentCommunityId = '';
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        token = data.token;
+
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('alias').innerText = data.identity.aliasName;
+        document.getElementById('avatar').src = data.identity.avatarUrl;
+
+        // Check if volunteer can create communities
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'volunteer') {
+          fetchCommunities();
+          if (payload.canCreateCommunity) {
+            document.getElementById('create-section').style.display = 'block';
+          }
+        }
+      } else {
+        alert('Login failed: ' + (data.error || 'Unknown error'));
+      }
+    }
+
+    async function fetchCommunities() {
+      const res = await fetch('http://localhost:3000/api/community', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+
+      const select = document.getElementById('communitySelect');
+      select.innerHTML = '';
+
+      data.communities.forEach(comm => {
+        const option = document.createElement('option');
+        option.value = comm._id;
+        option.innerText = comm.name;
+        select.appendChild(option);
+      });
+    }
+
+    async function createCommunity() {
+      const name = document.getElementById('newCommunityName').value;
+      const res = await fetch('http://localhost:3000/api/community/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Community created!');
+        fetchCommunities();
+      } else {
+        alert('Failed: ' + data.error);
+      }
+    }
+
+    async function joinCommunity() {
+      const communityId = document.getElementById('communitySelect').value;
+
+      const res = await fetch(`http://localhost:3000/api/community/${communityId}/join`, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token }
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Joined community!');
+        currentCommunityId = communityId;
+        startSocket();
+        document.getElementById('chat-section').style.display = 'block';
+        document.getElementById('chatBox').innerHTML = '';
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+
+    function startSocket() {
+      socket = io('http://localhost:3000');
+
+      socket.emit('join-community', {
+        token,
+        communityId: currentCommunityId
+      });
+
+      socket.on('new-message', (msg) => {
+        const box = document.getElementById('chatBox');
+        const el = document.createElement('div');
+        el.className = 'msg';
+        el.innerHTML = `<strong>${msg.aliasName}</strong> <img src="${msg.avatarUrl}" width="25" height="25">: ${msg.message}`;
+        box.appendChild(el);
+        box.scrollTop = box.scrollHeight;
+      });
+    }
+
+    function sendMessage() {
+      const msg = document.getElementById('msg').value;
+      if (msg && socket) {
+        socket.emit('send-message', msg);
+        document.getElementById('msg').value = '';
+      }
+    }
+  </script>
+</body>
+</html>
