@@ -4,147 +4,137 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Brain, 
-  GamepadIcon, 
-  Trophy, 
-  Clock, 
-  Play, 
+import {
+  Brain,
+  GamepadIcon,
+  Trophy,
+  Clock,
+  Play,
   RotateCcw,
   CheckCircle,
   AlertCircle,
   Star,
-  Target
+  Target,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const quizzes = [
   {
-    id: '1',
-    title: 'Stress Level Assessment',
-    description: 'Evaluate your current stress levels and get personalized recommendations',
-    duration: '5-7 minutes',
-    questions: 15,
-    category: 'Assessment',
-    difficulty: 'Beginner',
-    icon: '🧠',
-    color: 'bg-blue-500',
-    completed: false
+    id: "phq9",
+    title: "PHQ-9 Depression Screening",
+    description:
+      "Patient Health Questionnaire-9 to assess depression symptoms over the last 2 weeks",
+    duration: "3-5 minutes",
+    questions: 9,
+    category: "Mental Health",
+    difficulty: "Clinical",
+    icon: "🧠",
+    color: "bg-blue-500",
+    completed: false,
+    questions_data: [
+      "Little interest or pleasure in doing things",
+      "Feeling down, depressed, or hopeless",
+      "Trouble falling or staying asleep, or sleeping too much",
+      "Feeling tired or having little energy",
+      "Poor appetite or overeating",
+      "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+      "Trouble concentrating on things, such as reading the newspaper or watching television",
+      "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+      "Thoughts that you would be better off dead or of hurting yourself in some way",
+    ],
   },
   {
-    id: '2',
-    title: 'Sleep Quality Analyzer',
-    description: 'Understand your sleep patterns and discover improvement strategies',
-    duration: '3-5 minutes',
-    questions: 12,
-    category: 'Wellness',
-    difficulty: 'Beginner',
-    icon: '😴',
-    color: 'bg-purple-500',
-    completed: true
+    id: "gad7",
+    title: "GAD-7 Anxiety Assessment",
+    description:
+      "Generalized Anxiety Disorder 7-item scale to measure anxiety symptoms over the last 2 weeks",
+    duration: "2-4 minutes",
+    questions: 7,
+    category: "Mental Health",
+    difficulty: "Clinical",
+    icon: "💚",
+    color: "bg-green-500",
+    completed: false,
+    questions_data: [
+      "Feeling nervous, anxious or on edge",
+      "Not being able to stop or control worrying",
+      "Worrying too much about different things",
+      "Trouble relaxing",
+      "Being so restless that it is hard to sit still",
+      "Becoming easily annoyed or irritable",
+      "Feeling afraid as if something awful might happen",
+    ],
   },
-  {
-    id: '3',
-    title: 'Anxiety Awareness Check',
-    description: 'Recognize anxiety symptoms and learn coping techniques',
-    duration: '8-10 minutes',
-    questions: 20,
-    category: 'Mental Health',
-    difficulty: 'Intermediate',
-    icon: '💚',
-    color: 'bg-green-500',
-    completed: false
-  },
-  {
-    id: '4',
-    title: 'Study Habits Evaluation',
-    description: 'Optimize your study techniques for better academic performance',
-    duration: '6-8 minutes',
-    questions: 18,
-    category: 'Academic',
-    difficulty: 'Beginner',
-    icon: '📚',
-    color: 'bg-orange-500',
-    completed: false
-  }
 ];
 
 const games = [
   {
-    id: '1',
-    title: 'Mindful Breathing',
-    description: 'Interactive breathing exercise game to reduce stress',
-    duration: '2-5 minutes',
-    type: 'Relaxation Game',
-    icon: '🫁',
-    color: 'bg-cyan-500',
-    highScore: null
+    id: "1",
+    title: "Mindful Breathing",
+    description: "Interactive breathing exercise game to reduce stress",
+    duration: "2-5 minutes",
+    type: "Relaxation Game",
+    icon: "🫁",
+    color: "bg-cyan-500",
+    highScore: null,
   },
   {
-    id: '2',
-    title: 'Gratitude Garden',
-    description: 'Plant virtual flowers by reflecting on positive moments',
-    duration: '5-10 minutes',
-    type: 'Mindfulness Game',
-    icon: '🌻',
-    color: 'bg-yellow-500',
-    highScore: 89
+    id: "2",
+    title: "Gratitude Garden",
+    description: "Plant virtual flowers by reflecting on positive moments",
+    duration: "5-10 minutes",
+    type: "Mindfulness Game",
+    icon: "🌻",
+    color: "bg-yellow-500",
+    highScore: 89,
   },
   {
-    id: '3',
-    title: 'Emotion Color Match',
-    description: 'Match colors to emotions to build emotional awareness',
-    duration: '3-7 minutes',
-    type: 'Educational Game',
-    icon: '🎨',
-    color: 'bg-pink-500',
-    highScore: 156
+    id: "3",
+    title: "Emotion Color Match",
+    description: "Match colors to emotions to build emotional awareness",
+    duration: "3-7 minutes",
+    type: "Educational Game",
+    icon: "🎨",
+    color: "bg-pink-500",
+    highScore: 156,
   },
   {
-    id: '4',
-    title: 'Stress Ball Squeeze',
-    description: 'Digital stress relief through interactive squeezing motions',
-    duration: '1-3 minutes',
-    type: 'Quick Relief',
-    icon: '⚡',
-    color: 'bg-red-500',
-    highScore: null
-  }
+    id: "4",
+    title: "Stress Ball Squeeze",
+    description: "Digital stress relief through interactive squeezing motions",
+    duration: "1-3 minutes",
+    type: "Quick Relief",
+    icon: "⚡",
+    color: "bg-red-500",
+    highScore: null,
+  },
 ];
 
-const sampleQuiz = {
-  title: 'Stress Level Assessment',
-  currentQuestion: 1,
-  totalQuestions: 15,
-  questions: [
-    {
-      id: 1,
-      question: 'How often do you feel overwhelmed by your responsibilities?',
-      options: [
-        'Never',
-        'Rarely',
-        'Sometimes',
-        'Often',
-        'Always'
-      ]
-    }
-  ]
-};
+const questionOptions = [
+  "Not at all",
+  "Several days",
+  "More than half the days",
+  "Nearly every day",
+];
 
 export default function Quizzes() {
   const [activeQuiz, setActiveQuiz] = useState<any>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+  const [answers, setAnswers] = useState<number[]>([]);
   const [quizProgress, setQuizProgress] = useState(0);
   const { toast } = useToast();
 
   const startQuiz = (quiz: any) => {
     setActiveQuiz(quiz);
+    setCurrentQuestion(0);
     setQuizProgress(0);
-    setSelectedAnswer('');
+    setSelectedAnswer("");
+    setAnswers([]);
   };
 
   const nextQuestion = () => {
-    if (!selectedAnswer) {
+    if (selectedAnswer === "") {
       toast({
         title: "Please select an answer",
         description: "Choose an option before proceeding.",
@@ -152,17 +142,36 @@ export default function Quizzes() {
       });
       return;
     }
-    
-    const newProgress = ((sampleQuiz.currentQuestion) / sampleQuiz.totalQuestions) * 100;
-    setQuizProgress(newProgress);
-    setSelectedAnswer('');
-    
-    if (sampleQuiz.currentQuestion >= sampleQuiz.totalQuestions) {
+
+    const newAnswers = [...answers, parseInt(selectedAnswer)];
+    setAnswers(newAnswers);
+
+    if (currentQuestion + 1 >= activeQuiz.questions) {
+      const totalScore = newAnswers.reduce((sum, score) => sum + score, 0);
+      const quizType = activeQuiz.id === "phq9" ? "depression" : "anxiety";
+
       toast({
-        title: "Quiz Completed!",
-        description: "Check your results and recommendations.",
+        title: "Assessment Completed!",
+        description: `Total score: ${totalScore}. View your results and recommendations.`,
       });
       setActiveQuiz(null);
+    } else {
+      setCurrentQuestion(currentQuestion + 1);
+      const newProgress = ((currentQuestion + 1) / activeQuiz.questions) * 100;
+      setQuizProgress(newProgress);
+    }
+
+    setSelectedAnswer("");
+  };
+
+  const previousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+      const newAnswers = answers.slice(0, -1);
+      setAnswers(newAnswers);
+      setSelectedAnswer("");
+      const newProgress = (currentQuestion / activeQuiz.questions) * 100;
+      setQuizProgress(newProgress);
     }
   };
 
@@ -174,18 +183,22 @@ export default function Quizzes() {
   };
 
   if (activeQuiz) {
+    const currentQuestionText = activeQuiz.questions_data[currentQuestion];
+
     return (
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">{sampleQuiz.title}</h1>
+            <h1 className="text-2xl font-bold">{activeQuiz.title}</h1>
             <Button variant="outline" onClick={() => setActiveQuiz(null)}>
-              Exit Quiz
+              Exit Assessment
             </Button>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Question {sampleQuiz.currentQuestion} of {sampleQuiz.totalQuestions}</span>
+              <span>
+                Question {currentQuestion + 1} of {activeQuiz.questions}
+              </span>
               <span>{Math.round(quizProgress)}% Complete</span>
             </div>
             <Progress value={quizProgress} className="h-2" />
@@ -193,32 +206,51 @@ export default function Quizzes() {
         </div>
 
         <Card className="wellness-card p-8">
+          <div className="mb-6">
+            <div className="text-sm text-muted-foreground mb-2">
+              {activeQuiz.id === "phq9" ? "PHQ-9" : "GAD-7"}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Over the last 2 weeks, how often have you been bothered by the
+              following problem?
+            </p>
+          </div>
+
           <h2 className="text-xl font-semibold mb-6">
-            {sampleQuiz.questions[0].question}
+            {currentQuestion + 1}. {currentQuestionText}
           </h2>
-          
+
           <div className="space-y-3 mb-8">
-            {sampleQuiz.questions[0].options.map((option, index) => (
+            {questionOptions.map((option, index) => (
               <button
                 key={index}
-                onClick={() => setSelectedAnswer(option)}
+                onClick={() => setSelectedAnswer(index.toString())}
                 className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
-                  selectedAnswer === option
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
+                  selectedAnswer === index.toString()
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
                 }`}
               >
-                {option}
+                <div className="flex items-center justify-between">
+                  <span>{option}</span>
+                  <span className="text-sm text-muted-foreground">{index}</span>
+                </div>
               </button>
             ))}
           </div>
-          
+
           <div className="flex justify-between">
-            <Button variant="outline" disabled>
+            <Button
+              variant="outline"
+              onClick={previousQuestion}
+              disabled={currentQuestion === 0}
+            >
               Previous
             </Button>
             <Button onClick={nextQuestion}>
-              Next Question
+              {currentQuestion + 1 >= activeQuiz.questions
+                ? "Complete Assessment"
+                : "Next Question"}
             </Button>
           </div>
         </Card>
@@ -231,7 +263,8 @@ export default function Quizzes() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Quizzes & Games</h1>
         <p className="text-muted-foreground">
-          Fun self-assessments and stress relief activities to support your mental wellness journey
+          Fun self-assessments and stress relief activities to support your
+          mental wellness journey
         </p>
       </div>
 
@@ -250,9 +283,14 @@ export default function Quizzes() {
         <TabsContent value="quizzes" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quizzes.map((quiz) => (
-              <Card key={quiz.id} className="wellness-card p-6 hover:shadow-lg transition-all">
+              <Card
+                key={quiz.id}
+                className="wellness-card p-6 hover:shadow-lg transition-all"
+              >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-full ${quiz.color} flex items-center justify-center text-2xl`}>
+                  <div
+                    className={`w-12 h-12 rounded-full ${quiz.color} flex items-center justify-center text-2xl`}
+                  >
                     {quiz.icon}
                   </div>
                   <div className="flex-1">
@@ -266,12 +304,12 @@ export default function Quizzes() {
                     </div>
                   </div>
                 </div>
-                
+
                 <h3 className="font-semibold mb-2">{quiz.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   {quiz.description}
                 </p>
-                
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="w-3 h-3" />
@@ -281,18 +319,23 @@ export default function Quizzes() {
                     <Target className="w-3 h-3" />
                     {quiz.questions} questions
                   </div>
-                  <Badge variant={quiz.difficulty === 'Beginner' ? 'default' : 'outline'} className="text-xs">
+                  <Badge
+                    variant={
+                      quiz.difficulty === "Beginner" ? "default" : "outline"
+                    }
+                    className="text-xs"
+                  >
                     {quiz.difficulty}
                   </Badge>
                 </div>
-                
-                <Button 
+
+                <Button
                   onClick={() => startQuiz(quiz)}
                   className="w-full"
-                  variant={quiz.completed ? 'outline' : 'default'}
+                  variant={quiz.completed ? "outline" : "default"}
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  {quiz.completed ? 'Retake Quiz' : 'Start Quiz'}
+                  {quiz.completed ? "Retake Quiz" : "Start Quiz"}
                 </Button>
               </Card>
             ))}
@@ -302,9 +345,14 @@ export default function Quizzes() {
         <TabsContent value="games" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {games.map((game) => (
-              <Card key={game.id} className="wellness-card p-6 hover:shadow-lg transition-all">
+              <Card
+                key={game.id}
+                className="wellness-card p-6 hover:shadow-lg transition-all"
+              >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-full ${game.color} flex items-center justify-center text-2xl`}>
+                  <div
+                    className={`w-12 h-12 rounded-full ${game.color} flex items-center justify-center text-2xl`}
+                  >
                     {game.icon}
                   </div>
                   <div className="flex-1">
@@ -313,12 +361,12 @@ export default function Quizzes() {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <h3 className="font-semibold mb-2">{game.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   {game.description}
                 </p>
-                
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="w-3 h-3" />
@@ -331,11 +379,8 @@ export default function Quizzes() {
                     </div>
                   )}
                 </div>
-                
-                <Button 
-                  onClick={() => startGame(game)}
-                  className="w-full"
-                >
+
+                <Button onClick={() => startGame(game)} className="w-full">
                   <GamepadIcon className="w-4 h-4 mr-2" />
                   Play Game
                 </Button>

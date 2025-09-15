@@ -34,6 +34,7 @@ const mainMenuItems = [
 ];
 
 const wellnessToolsItems = [
+  { title: "Quizzes & Games", url: "/quizzes", icon: GamepadIcon },
   { title: "Germs Game", url: "/game", icon: GamepadIcon },
   { title: "Mood Tracker", url: "/mood", icon: Heart },
   { title: "Sleep Tracker", url: "/sleep", icon: Moon },

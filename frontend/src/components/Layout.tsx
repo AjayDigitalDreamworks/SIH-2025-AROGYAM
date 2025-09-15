@@ -4,6 +4,7 @@ import { MindWellSidebar } from "@/components/MindWellSidebar";
 import { Bell, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export function Layout({ children }: LayoutProps) {
           <header className="bg-card border-b border-border px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <SidebarTrigger  />  {/* className="md:hidden" */}
+                <SidebarTrigger /> {/* className="md:hidden" */}
                 <div className="hidden sm:block">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -34,6 +35,8 @@ export function Layout({ children }: LayoutProps) {
               </div>
 
               <div className="flex items-center gap-4">
+                <ThemeToggle />
+
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="w-5 h-5" />
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
@@ -42,7 +45,9 @@ export function Layout({ children }: LayoutProps) {
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">Sarah Chen</p>
-                    <p className="text-xs text-muted-foreground">Computer Science</p>
+                    <p className="text-xs text-muted-foreground">
+                      Computer Science
+                    </p>
                   </div>
                   <Avatar>
                     <AvatarFallback className="bg-primary text-primary-foreground">
@@ -55,9 +60,7 @@ export function Layout({ children }: LayoutProps) {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 overflow-auto">
-            {children}
-          </main>
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
     </SidebarProvider>
