@@ -22,7 +22,8 @@ import {
   X
 } from "lucide-react";
 
-const cloudinaryBase = "https://res.cloudinary.com/<cloud_name>/video/upload/";
+// Set your actual Cloudinary cloud name below
+const cloudinaryBase = "https://res.cloudinary.com/dlpyvzfis/video/upload/";
 
 export default function Resources() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +43,11 @@ export default function Resources() {
     const fetchResources = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/hub/', { withCredentials: true });
+
+        
+
+        const response = await axios.get('http://localhost:3000/hub/'); // Replace with actual API URL
+
         const data = response.data;
 
         // Safe fallback in case any key is missing
@@ -237,14 +242,18 @@ export default function Resources() {
                   preload="metadata"
                   playsInline
                 >
-                  <source
-                    src={
-                      selectedVideo.videoUrl?.startsWith('http')
-                        ? selectedVideo.videoUrl
-                        : cloudinaryBase + selectedVideo.videoUrl
-                    }
-                    type="video/mp4"
-                  />
+                  {selectedVideo.videoUrl ? (
+                    <source
+                      src={
+                        selectedVideo.videoUrl.startsWith('http')
+                          ? selectedVideo.videoUrl
+                          : cloudinaryBase + selectedVideo.videoUrl
+                      }
+                      type="video/mp4"
+                    />
+                  ) : (
+                    <div className="text-center text-red-500 p-4">Video URL not available</div>
+                  )}
                   Your browser does not support the video tag.
                 </video>
               </div>
