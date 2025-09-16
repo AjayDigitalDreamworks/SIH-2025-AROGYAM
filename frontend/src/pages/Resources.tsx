@@ -42,7 +42,7 @@ export default function Resources() {
     const fetchResources = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/hub/'); // Replace with actual API URL
+        const response = await axios.get('http://localhost:3000/hub/', { withCredentials: true });
         const data = response.data;
 
         // Safe fallback in case any key is missing
@@ -229,19 +229,25 @@ export default function Resources() {
           </DialogHeader>
           {selectedVideo && (
             <div className="space-y-4">
-              <video
-                controls
-                className="w-full rounded-lg"
-                poster={selectedVideo?.thumbnailUrl}
-                preload="metadata"
-                playsInline
-              >
-                <source
-                  src={cloudinaryBase + selectedVideo.videoUrl}
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
+              <div className="w-full flex justify-center">
+                <video
+                  controls
+                  className="w-full max-w-3xl h-auto max-h-[70vh] rounded-lg"
+                  poster={selectedVideo?.thumbnailUrl}
+                  preload="metadata"
+                  playsInline
+                >
+                  <source
+                    src={
+                      selectedVideo.videoUrl?.startsWith('http')
+                        ? selectedVideo.videoUrl
+                        : cloudinaryBase + selectedVideo.videoUrl
+                    }
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />

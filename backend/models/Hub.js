@@ -11,4 +11,5 @@ const videoSchema = new mongoose.Schema({
   thumbnailUrl: String   // 👈 New Field
 });
 
+
 module.exports = mongoose.model('Video', videoSchema);
