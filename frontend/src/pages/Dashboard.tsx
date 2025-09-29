@@ -58,8 +58,8 @@ export default function Dashboard() {
 		axios
 			.get("http://localhost:3000/current_user", { withCredentials: true })
 			.then((response) => {
-				console.log("Fetched user:", response.data);
-				setUser(response.data);
+				console.log("Fetched user:", response.data.user);
+				setUser(response.data.user);
 			})
 			.catch((error) => {
 				console.error("Error fetching user:", error);
