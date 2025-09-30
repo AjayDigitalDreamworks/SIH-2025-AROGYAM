@@ -18,8 +18,6 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const moodRoutes = require('./routes/moodRoutes');
-app.use('/api/mood', moodRoutes);
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:8080",
@@ -100,7 +98,10 @@ app.get("/current_user", (req, res) => {
   }
 });
 
-
+const moodRoutes = require('./routes/moodRoutes');
+app.use('/api/mood', moodRoutes);
+const sleepRoutes = require('./routes/sleepRoutes');
+app.use('/api/sleep', sleepRoutes);
 
 const videoRoutes = require('./routes/videoRoutes');
 app.use('/videos', videoRoutes);
