@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -17,7 +18,8 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-
+const moodRoutes = require('./routes/moodRoutes');
+app.use('/api/mood', moodRoutes);
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:8080",
@@ -91,10 +93,10 @@ app.get("/counselors", async (req, res) => {
 });
  // sending user data to the frontend
 app.get("/current_user", (req, res) => {
-  if (req.isAuthenticated()) {  
-    res.json({ user: req.user });
+  if (req.isAuthenticated()) {
+    res.json({user:req.user});
   } else {
-    res.status(401).json({ user: null });
+    res.status(401).json({ message: "Not authenticated" });
   }
 });
 
@@ -166,28 +168,30 @@ app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
 app.post('/addvolunteer', verifyToken, addVolunteer);
-// app.post("/login", (req, res, next) => {
-//   passport.authenticate("local", (err, user, info) => {
-//     if (err) {
-//       console.error('Authentication error:', err);
-//       return res.status(500).send("Authentication error: " + err.message);
-//     }
-//     if (!user) {
-//       console.log('Login failed: Invalid credentials');
-//       return res.status(401).send("Invalid credentials");
-//     }
+/*
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error('Authentication error:', err);
+      return res.status(500).send("Authentication error: " + err.message);
+    }
+    if (!user) {
+      console.log('Login failed: Invalid credentials');
+      return res.status(401).send("Invalid credentials");
+    }
 
-//     req.login(user, (err) => {
-//       if (err) {
-//         console.error('Login error:', err);
-//         return res.status(500).send("Login error: " + err.message);
-//       }
+    req.login(user, (err) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).send("Login error: " + err.message);
+      }
 
-//       console.log('Login successful, user:', req.user);
-//       res.redirect("http://localhost:8080/");
-//     });
-//   })(req, res, next);
-// });
+      console.log('Login successful, user:', req.user);
+      res.redirect("http://localhost:8080/");
+    });
+  })(req, res, next);
+});
+*/
 const volunteerRoutes = require('./routes/volunteer');
 app.use('/login', volunteerRoutes);
 

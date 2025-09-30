@@ -12,6 +12,7 @@ import { UpcomingAppointments } from "@/components/UpcomingAppointments";
 import { LatestResources } from "@/components/LatestResources";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import Mood from "./Mood";
 
 const wellnessData = [
 	{
@@ -101,9 +102,6 @@ export default function Dashboard() {
           </div>
         </div> */}
 
-				<div className="mb-8">
-					<MoodTracker />
-				</div>
 				{/* <div className="mb-8">
           <MoodTracker />
          </div> */}

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
+
+
 import { 
   Heart, 
   TrendingUp, 
@@ -27,13 +29,13 @@ const moods = [
 ];
 
 const moodHistory = [
-  { date: '2024-01-15', mood: 4, note: 'Had a great study session with friends!' },
-  { date: '2024-01-14', mood: 3, note: 'Feeling okay, but a bit stressed about upcoming exam.' },
-  { date: '2024-01-13', mood: 5, note: 'Amazing day! Got good news about internship.' },
-  { date: '2024-01-12', mood: 2, note: 'Feeling down, homesick today.' },
-  { date: '2024-01-11', mood: 4, note: 'Good productive day, worked out in the morning.' },
-  { date: '2024-01-10', mood: 3, note: 'Average day, nothing special happened.' },
-  { date: '2024-01-09', mood: 4, note: 'Nice weather, spent time outdoors.' },
+  { date: '2025-01-15', mood: 4, note: 'Had a great study session with friends!' },
+  { date: '2025-01-14', mood: 3, note: 'Feeling okay, but a bit stressed about upcoming exam.' },
+  { date: '2025-01-13', mood: 5, note: 'Amazing day! Got good news about internship.' },
+  { date: '2025-01-12', mood: 2, note: 'Feeling down, homesick today.' },
+  { date: '2025-01-11', mood: 4, note: 'Good productive day, worked out in the morning.' },
+  { date: '2025-01-10', mood: 3, note: 'Average day, nothing special happened.' },
+  { date: '2025-01-09', mood: 4, note: 'Nice weather, spent time outdoors.' },
 ];
 
 const weeklyData = [
@@ -54,11 +56,28 @@ const monthlyInsights = {
   totalEntries: 28
 };
 
-export default function Mood() {
+
+interface MoodProps {
+  userId?: string;
+}
+export default function Mood({ userId }: MoodProps) {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [moodNote, setMoodNote] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [user, setUser] = useState(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/current_user", { withCredentials: true })
+      .then((response) => {
+        console.log("Fetched user:", response.data.user);
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
   const handleMoodSubmit = async () => {
     if (!selectedMood) {
@@ -69,9 +88,17 @@ export default function Mood() {
       });
       return;
     }
-
+    if (!user?._id) {
+      toast({
+        title: "User not found",
+        description: "Please log in again.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       await axios.post("http://localhost:3000/api/mood", {
+        userId: user._id,
         mood: selectedMood,
         note: moodNote,
         date: selectedDate || new Date()
