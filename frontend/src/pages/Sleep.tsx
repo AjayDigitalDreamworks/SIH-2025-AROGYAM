@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { Moon, Clock, TrendingUp, Calendar, Star, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Sleep() {
   const [sleepHours, setSleepHours] = useState(7.5);
@@ -30,14 +32,65 @@ export default function Sleep() {
     "Avoid screens 1 hour before bed",
     "Limit caffeine after 2 PM"
   ];
+  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const { toast } = useToast();
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/current_user", { withCredentials: true })
+      .then((response) => {
+        console.log("Fetched user:", response.data.user);
+        setUser(response.data.user);
+        setUserId(response.data.user._id); // Assuming the user ID is available here
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
-  const handleLogSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSleepHours(Number(logHours));
-    setSleepQuality(logQuality);
-    setShowLogModal(false);
-    setLogHours("");
-    setLogQuality(3);
+ const handleLogSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const hours = Number(logHours);
+
+  setSleepHours(hours);
+  setSleepQuality(logQuality);
+
+  // Call backend submit function
+  await handleSleepSubmit(hours, new Date());
+
+  setShowLogModal(false);
+  setLogHours("");
+  setLogQuality(3);
+};
+
+
+  const handleSleepSubmit = async (hours: number, sleepDate: Date) => {
+    if (!userId) {
+      toast({
+        title: "User not found",
+        description: "Please log in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await axios.post("http://localhost:3000/api/sleep", {
+        userId,
+        hours,
+        quality: sleepQuality, // <-- add this
+        date: sleepDate || new Date()
+      });
+      toast({
+        title: "Sleep Recorded!",
+        description: "Your sleep data has been saved to your wellness journey.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not save your sleep data. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

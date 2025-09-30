@@ -1,4 +1,5 @@
 
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -17,6 +18,8 @@ const addVolunteer = require('./controllers/addVolunteer');
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
+const quizRoutes = require('./routes/quizRoutes');
+app.use('/api/quiz', quizRoutes);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
