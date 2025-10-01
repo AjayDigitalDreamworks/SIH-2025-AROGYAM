@@ -5,6 +5,8 @@ const cors = require("cors");
 
 router.options('/', cors());
 
+
+
 // POST /api/quiz - Add a quiz score to the current user
 router.post('/', async (req, res) => {
   try {
