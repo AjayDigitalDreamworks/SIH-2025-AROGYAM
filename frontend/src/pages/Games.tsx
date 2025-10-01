@@ -5,7 +5,7 @@ const IframeComponent = () => {
     <iframe
       src="https://skribbl.io/"
       width="100%"
-      height="800px"
+      height="650px"
       style={{ border: 'none' }}
       title="Skribbl.io Game"
     />

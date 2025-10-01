@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -17,6 +17,22 @@ import {
   Target,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+
+// Function to send quiz score to backend
+const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
+  try {
+    await axios.post("http://localhost:3000/api/quiz", {
+      userId,
+      score,
+      quiz_type,
+      date
+    }, { withCredentials: true });
+    console.log("Quiz score submitted!");
+  } catch (error) {
+    console.error("Error submitting quiz score:", error);
+  }
+};
 
 const quizzes = [
   {
@@ -132,7 +148,20 @@ export default function Quizzes() {
     setSelectedAnswer("");
     setAnswers([]);
   };
+    const [user, setUser] = useState(null);
+ useEffect(() => {
+    axios
+      .get("http://localhost:3000/current_user", { withCredentials: true })
+      .then((response) => {
+        console.log("Fetched user:", response.data.user);
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
+  
   const nextQuestion = () => {
     if (selectedAnswer === "") {
       toast({
@@ -149,6 +178,25 @@ export default function Quizzes() {
     if (currentQuestion + 1 >= activeQuiz.questions) {
       const totalScore = newAnswers.reduce((sum, score) => sum + score, 0);
       const quizType = activeQuiz.id === "phq9" ? "depression" : "anxiety";
+      const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
+  try {
+    await axios.post("http://localhost:3000/api/quiz", {
+      userId,
+      score,
+      quiz_type,
+      date
+    } , {withCredentials:true});
+    // Optionally show a toast or update state
+    console.log("Quiz score submitted!");
+  } catch (error) {
+    console.error("Error submitting quiz score:", error);
+  }
+};
+      // Send the quiz score to the backend
+      if (user) {
+        sendQuizScore(user._id, totalScore, quizType);
+      }
+
 
       toast({
         title: "Assessment Completed!",
