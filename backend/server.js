@@ -18,8 +18,6 @@ const addVolunteer = require('./controllers/addVolunteer');
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
-const quizRoutes = require('./routes/quizRoutes');
-app.use('/api/quiz', quizRoutes);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
@@ -105,6 +103,9 @@ const moodRoutes = require('./routes/moodRoutes');
 app.use('/api/mood', moodRoutes);
 const sleepRoutes = require('./routes/sleepRoutes');
 app.use('/api/sleep', sleepRoutes);
+
+const quizRoutes = require('./routes/quizRoutes');
+app.use('/api/quiz', quizRoutes);
 
 const videoRoutes = require('./routes/videoRoutes');
 app.use('/videos', videoRoutes);
