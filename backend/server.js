@@ -55,7 +55,13 @@ const sessionOption = {
 
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:8080", // Updated to match frontend port
+  origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS (Socket.IO)"));
+      }
+    },
   credentials: true, // Allow cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
