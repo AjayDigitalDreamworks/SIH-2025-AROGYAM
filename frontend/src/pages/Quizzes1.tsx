@@ -1,12 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState , useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, GamepadIcon, Trophy, Clock, Play, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Brain,
+  GamepadIcon,
+  Trophy,
+  Clock,
+  Play,
+  RotateCcw,
+  CheckCircle,
+  AlertCircle,
+  Star,
+  Target,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+
+// Function to send quiz score to backend
+const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
+  try {
+    await axios.post("http://localhost:3000/api/quiz", {
+      userId,
+      score,
+      quiz_type,
+      date
+    }, { withCredentials: true });
+    console.log("Quiz score submitted!");
+  } catch (error) {
+    console.error("Error submitting quiz score:", error);
+  }
+};
 
 const quizzes = [
   {
@@ -114,32 +140,6 @@ export default function Quizzes() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [quizProgress, setQuizProgress] = useState(0);
   const { toast } = useToast();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/current_user", { withCredentials: true })
-      .then((response) => {
-        setUser(response.data.user);
-      })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
-      });
-  }, []);
-
-  const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
-    try {
-      await axios.post("http://localhost:3000/api/quiz", {
-        userId,
-        score,
-        quiz_type,
-        date
-      }, { withCredentials: true });
-      console.log("Quiz score submitted!");
-    } catch (error) {
-      console.error("Error submitting quiz score:", error);
-    }
-  };
 
   const startQuiz = (quiz: any) => {
     setActiveQuiz(quiz);
@@ -148,10 +148,27 @@ export default function Quizzes() {
     setSelectedAnswer("");
     setAnswers([]);
   };
+    const [user, setUser] = useState(null);
+ useEffect(() => {
+    axios
+      .get("http://localhost:3000/current_user", { withCredentials: true })
+      .then((response) => {
+        console.log("Fetched user:", response.data.user);
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
+  
   const nextQuestion = () => {
     if (selectedAnswer === "") {
-      toast({ title: "Please select an answer", description: "Choose an option before proceeding.", variant: "destructive" });
+      toast({
+        title: "Please select an answer",
+        description: "Choose an option before proceeding.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -161,13 +178,35 @@ export default function Quizzes() {
     if (currentQuestion + 1 >= activeQuiz.questions) {
       const totalScore = newAnswers.reduce((sum, score) => sum + score, 0);
       const quizType = activeQuiz.id === "phq9" ? "depression" : "anxiety";
-      if (user) sendQuizScore(user._id, totalScore, quizType);
+      const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
+  try {
+    await axios.post("http://localhost:3000/api/quiz", {
+      userId,
+      score,
+      quiz_type,
+      date
+    } , {withCredentials:true});
+    // Optionally show a toast or update state
+    console.log("Quiz score submitted!");
+  } catch (error) {
+    console.error("Error submitting quiz score:", error);
+  }
+};
+      // Send the quiz score to the backend
+      if (user) {
+        sendQuizScore(user._id, totalScore, quizType);
+      }
 
-      toast({ title: "Assessment Completed!", description: `Total score: ${totalScore}. View your results and recommendations.` });
+
+      toast({
+        title: "Assessment Completed!",
+        description: `Total score: ${totalScore}. View your results and recommendations.`,
+      });
       setActiveQuiz(null);
     } else {
       setCurrentQuestion(currentQuestion + 1);
-      setQuizProgress(((currentQuestion + 1) / activeQuiz.questions) * 100);
+      const newProgress = ((currentQuestion + 1) / activeQuiz.questions) * 100;
+      setQuizProgress(newProgress);
     }
 
     setSelectedAnswer("");
@@ -176,45 +215,70 @@ export default function Quizzes() {
   const previousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      setAnswers(answers.slice(0, -1));
+      const newAnswers = answers.slice(0, -1);
+      setAnswers(newAnswers);
       setSelectedAnswer("");
-      setQuizProgress((currentQuestion / activeQuiz.questions) * 100);
+      const newProgress = (currentQuestion / activeQuiz.questions) * 100;
+      setQuizProgress(newProgress);
     }
   };
 
   const startGame = (game: any) => {
-    toast({ title: `Starting ${game.title}`, description: "Game is loading... Have fun!" });
+    toast({
+      title: `Starting ${game.title}`,
+      description: "Game is loading... Have fun!",
+    });
   };
 
   if (activeQuiz) {
     const currentQuestionText = activeQuiz.questions_data[currentQuestion];
+
     return (
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">{activeQuiz.title}</h1>
-            <Button variant="outline" onClick={() => setActiveQuiz(null)}>Exit Assessment</Button>
+            <Button variant="outline" onClick={() => setActiveQuiz(null)}>
+              Exit Assessment
+            </Button>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Question {currentQuestion + 1} of {activeQuiz.questions}</span>
+              <span>
+                Question {currentQuestion + 1} of {activeQuiz.questions}
+              </span>
               <span>{Math.round(quizProgress)}% Complete</span>
             </div>
             <Progress value={quizProgress} className="h-2" />
           </div>
         </div>
+
         <Card className="wellness-card p-8">
           <div className="mb-6">
+            <div className="text-sm text-muted-foreground mb-2">
+              {activeQuiz.id === "phq9" ? "PHQ-9" : "GAD-7"}
+            </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Over the last 2 weeks, how often have you been bothered by the following problem?
+              Over the last 2 weeks, how often have you been bothered by the
+              following problem?
             </p>
           </div>
 
-          <h2 className="text-xl font-semibold mb-6">{currentQuestion + 1}. {currentQuestionText}</h2>
+          <h2 className="text-xl font-semibold mb-6">
+            {currentQuestion + 1}. {currentQuestionText}
+          </h2>
 
           <div className="space-y-3 mb-8">
             {questionOptions.map((option, index) => (
-              <button key={index} onClick={() => setSelectedAnswer(index.toString())} className={`w-full p-4 text-left rounded-lg border-2 transition-all ${selectedAnswer === index.toString() ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
+              <button
+                key={index}
+                onClick={() => setSelectedAnswer(index.toString())}
+                className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                  selectedAnswer === index.toString()
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <span>{option}</span>
                   <span className="text-sm text-muted-foreground">{index}</span>
@@ -224,9 +288,17 @@ export default function Quizzes() {
           </div>
 
           <div className="flex justify-between">
-            <Button variant="outline" onClick={previousQuestion} disabled={currentQuestion === 0}>Previous</Button>
+            <Button
+              variant="outline"
+              onClick={previousQuestion}
+              disabled={currentQuestion === 0}
+            >
+              Previous
+            </Button>
             <Button onClick={nextQuestion}>
-              {currentQuestion + 1 >= activeQuiz.questions ? "Complete Assessment" : "Next Question"}
+              {currentQuestion + 1 >= activeQuiz.questions
+                ? "Complete Assessment"
+                : "Next Question"}
             </Button>
           </div>
         </Card>
@@ -238,8 +310,12 @@ export default function Quizzes() {
     <div className="container mx-auto px-6 py-8 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Quizzes & Games</h1>
-        <p className="text-muted-foreground">Fun self-assessments and stress relief activities to support your mental wellness journey</p>
+        <p className="text-muted-foreground">
+          Fun self-assessments and stress relief activities to support your
+          mental wellness journey
+        </p>
       </div>
+
       <Tabs defaultValue="quizzes" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
           <TabsTrigger value="quizzes" className="flex items-center gap-2">
@@ -251,41 +327,132 @@ export default function Quizzes() {
             Wellness Games
           </TabsTrigger>
         </TabsList>
+
         <TabsContent value="quizzes" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quizzes.map((quiz) => (
-              <Card key={quiz.id} className="wellness-card p-6 hover:shadow-lg transition-all">
+              <Card
+                key={quiz.id}
+                className="wellness-card p-6 hover:shadow-lg transition-all"
+              >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-full ${quiz.color} flex items-center justify-center text-2xl`}>
+                  <div
+                    className={`w-12 h-12 rounded-full ${quiz.color} flex items-center justify-center text-2xl`}
+                  >
                     {quiz.icon}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">{quiz.category}</Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {quiz.category}
+                      </Badge>
+                      {quiz.completed && (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      )}
                     </div>
                   </div>
                 </div>
+
                 <h3 className="font-semibold mb-2">{quiz.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{quiz.description}</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {quiz.description}
+                </p>
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" /> {quiz.duration}
+                    <Clock className="w-3 h-3" />
+                    {quiz.duration}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Trophy className="w-3 h-3" /> {quiz.questions} questions
+                    <Target className="w-3 h-3" />
+                    {quiz.questions} questions
                   </div>
+                  <Badge
+                    variant={
+                      quiz.difficulty === "Beginner" ? "default" : "outline"
+                    }
+                    className="text-xs"
+                  >
+                    {quiz.difficulty}
+                  </Badge>
                 </div>
-                <Button onClick={() => startQuiz(quiz)} className="w-full">
-                  <Play className="w-4 h-4 mr-2" /> Start Quiz
+
+                <Button
+                  onClick={() => startQuiz(quiz)}
+                  className="w-full"
+                  variant={quiz.completed ? "outline" : "default"}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  {quiz.completed ? "Retake Quiz" : "Start Quiz"}
                 </Button>
               </Card>
             ))}
           </div>
         </TabsContent>
+
         <TabsContent value="games" className="space-y-6">
-          {/* Render games here */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {games.map((game) => (
+              <Card
+                key={game.id}
+                className="wellness-card p-6 hover:shadow-lg transition-all"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className={`w-12 h-12 rounded-full ${game.color} flex items-center justify-center text-2xl`}
+                  >
+                    {game.icon}
+                  </div>
+                  <div className="flex-1">
+                    <Badge variant="secondary" className="text-xs">
+                      {game.type}
+                    </Badge>
+                  </div>
+                </div>
+
+                <h3 className="font-semibold mb-2">{game.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {game.description}
+                </p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    {game.duration}
+                  </div>
+                  {game.highScore && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Trophy className="w-3 h-3" />
+                      High Score: {game.highScore}
+                    </div>
+                  )}
+                </div>
+
+                <Button onClick={() => startGame(game)} className="w-full">
+                  <GamepadIcon className="w-4 h-4 mr-2" />
+                  Play Game
+                </Button>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
+
+      {/* Quick Stats */}
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="wellness-card p-6 text-center">
+          <div className="text-2xl font-bold text-primary mb-2">12</div>
+          <div className="text-sm text-muted-foreground">Quizzes Completed</div>
+        </Card>
+        <Card className="wellness-card p-6 text-center">
+          <div className="text-2xl font-bold text-primary mb-2">45</div>
+          <div className="text-sm text-muted-foreground">Games Played</div>
+        </Card>
+        <Card className="wellness-card p-6 text-center">
+          <div className="text-2xl font-bold text-primary mb-2">7</div>
+          <div className="text-sm text-muted-foreground">Day Streak</div>
+        </Card>
+      </div>
     </div>
   );
 }
