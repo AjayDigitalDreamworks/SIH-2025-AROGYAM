@@ -42,16 +42,17 @@ mongoose
   .catch((err) => console.log(err));
 
 const sessionOption = {
-  secret: process.env.SESSION_SECRET || "yadavji06",
-  resave: false,
-  saveUninitialized: false,
+  secret: process.env.SESSION_SECRET || "yadavji06", // Secret for the session
+  resave: false, // Don't save session if it wasn't modified
+  saveUninitialized: false, // Don't save empty sessions
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    httpOnly: false,
-    secure: true,
-    sameSite: 'lax'
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    httpOnly: true, // Can't be accessed via JavaScript
+    secure: process.env.NODE_ENV === 'production', // Set to true in production (HTTPS)
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Set to 'None' for cross-origin cookies in production
   },
 };
+
 
 
 // app.use(cors({
