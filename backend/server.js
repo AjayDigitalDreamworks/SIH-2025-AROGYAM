@@ -19,9 +19,63 @@ const server = http.createServer(app);
 const MongoStore = require('connect-mongo');
 const { Server } = require("socket.io");
 const allowedOrigins = [
-  "https://sih-2025-arogyam.onrender.com",
-  "http://localhost:8080",
+      "http://localhost:8080", 
+      "https://sih-2025-arogyam.onrender.com",
+      "http://localhost:3000",
+      "https://sih-2025-arogyam-0cf2.onrender.com" 
 ];
+
+
+
+
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL_RENDER, 
+      "http://localhost:8080", 
+      "https://sih-2025-arogyam.onrender.com",
+      "http://localhost:3000",
+      "https://sih-2025-arogyam-0cf2.onrender.com" 
+    ];
+
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use(session(sessionOption));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  res.locals.currUser = req.user;
+  console.log('Current user in session:', req.user);
+  next();
+});
+
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+const path = require("path");
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+
+
 
 const io = new Server(server, {
   cors: {
@@ -67,57 +121,6 @@ const sessionOption = {
 //   allowedHeaders: ['Content-Type', 'Authorization']
 // }));
 
-
-
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      process.env.FRONTEND_URL_RENDER, 
-      "http://localhost:8080", 
-      "https://sih-2025-arogyam.onrender.com",
-      "http://localhost:3000",
-      "https://sih-2025-arogyam-0cf2.onrender.com" 
-    ];
-
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-
-
-
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-
-app.use(session(sessionOption));
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use((req, res, next) => {
-  res.locals.currUser = req.user;
-  console.log('Current user in session:', req.user);
-  next();
-});
-
-
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-const path = require("path");
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
 
 
 
