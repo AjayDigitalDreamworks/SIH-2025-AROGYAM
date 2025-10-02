@@ -257,6 +257,35 @@ app.get("/login", (req, res) => {
 });
 app.post('/addvolunteer', verifyToken, addVolunteer);
 
+// app.post("/login", (req, res, next) => {
+//   passport.authenticate("local", (err, user, info) => {
+//     if (err) {
+//       console.error("Authentication error:", err);
+//       return res.status(500).json({ message: "Authentication error", error: err.message });
+//     }
+//     if (!user) {
+//       console.log("Login failed: Invalid credentials");
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     req.login(user, (err) => {
+//       if (err) {
+//         console.error("Login error:", err);
+//         return res.status(500).json({ message: "Login error", error: err.message });
+//       }
+
+//       console.log("Login successful, user:", req.user);
+
+//       // Ensure the session is saved before redirect
+//       req.session.save(() => {
+//         res.redirect("https://sih-2025-arogyam.onrender.com/dashboard");
+//       });
+//     });
+//   })(req, res, next);
+// });
+
+
+
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -274,12 +303,22 @@ app.post("/login", (req, res, next) => {
         return res.status(500).json({ message: "Login error", error: err.message });
       }
 
-      console.log("Login successful, user:", req.user);
+      // Manually set the session cookie
+      const sessionId = req.sessionID; // Session ID from Express session
+      const cookieOptions = {
+         maxAge: 1000 * 60 * 60 * 24 * 7, 
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === 'production', // secure cookies for HTTPS
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',         
+      };
 
-      // Ensure the session is saved before redirect
-      req.session.save(() => {
-        res.redirect("https://sih-2025-arogyam.onrender.com/dashboard");
-      });
+      // Set the cookie manually
+      res.cookie('connect.sid', sessionId, cookieOptions);
+
+      console.log("Login successful, session data:", req.session);
+
+      // Now redirect to the dashboard
+      res.redirect("https://sih-2025-arogyam.onrender.com/dashboard");
     });
   })(req, res, next);
 });
