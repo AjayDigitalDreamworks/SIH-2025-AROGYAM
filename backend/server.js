@@ -303,25 +303,27 @@ app.post("/login", (req, res, next) => {
         return res.status(500).json({ message: "Login error", error: err.message });
       }
 
-      // Manually set the session cookie
-      const sessionId = req.sessionID; // Session ID from Express session
+      // Log session ID and cookie value
+      console.log("Session ID:", req.sessionID);  // Log the session ID
+      const sessionId = req.sessionID;
+      console.log("Setting cookie: ", sessionId);
+      
       const cookieOptions = {
-         maxAge: 1000 * 60 * 60 * 24 * 7, 
-    httpOnly: true, 
-    secure: process.env.NODE_ENV === 'production', // secure cookies for HTTPS
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',         
+        maxAge: 1000 * 60 * 60 * 24 * 7,  // 7 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None',
+        domain: '.onrender.com',  // Ensure cookies are shared across subdomains
       };
 
-      // Set the cookie manually
       res.cookie('connect.sid', sessionId, cookieOptions);
+      console.log("Cookie set successfully!");
 
-      console.log("Login successful, session data:", req.session);
-
-      // Now redirect to the dashboard
       res.redirect("https://sih-2025-arogyam.onrender.com/dashboard");
     });
   })(req, res, next);
 });
+
 
 
 
