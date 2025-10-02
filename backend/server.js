@@ -48,7 +48,7 @@ mongoose
 
 // ✅ Session configuration
 const sessionOption = {
-  secret: process.env.SESSION_SECRET || "mysupersecretcode",
+  secret: process.env.SESSION_SECRET || "yadavji06",
   resave: false,
   saveUninitialized: false,
   cookie: {
