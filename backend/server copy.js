@@ -18,13 +18,11 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
-// 🔑 FIXED: Define allowedOrigins once at the top
-const allowedOrigins = [
-  "http://localhost:8080",
-  "https://sih-2025-arogyam.onrender.com",
-  "http://localhost:3000",
-  "https://sih-2025-arogyam-0cf2.onrender.com",
-];
+// ✅ Allowed frontend origins
+// const allowedOrigins = [
+//   "http://localhost:8080",
+//   "https://sih-2025-arogyam.onrender.com",
+// ];
 
 // ✅ Socket.IO setup with CORS configuration
 const io = new Server(server, {
@@ -57,14 +55,33 @@ const sessionOption = {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     httpOnly: true,
     secure: false, // Ensure this is true in production (HTTPS)
-    sameSite: 'None', // Important for cross-origin cookies
+    sameSite: 'None',  // Important for cross-origin cookies
   },
 };
 
-// 🔑 FIXED: CORS and Body Parser middleware setup
+// ✅ CORS and Body Parser
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     } else {
+//       return callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
+
+
+const allowedOrigins = [
+  "http://localhost:8080", // Local development frontend
+  "https://sih-2025-arogyam.onrender.com", // Production frontend
+];
+
 app.use(cors({
   origin: function (origin, callback) {
-    // If the origin is not specified (e.g., from Postman or mobile apps), allow it
+    // If the origin is not specified (like when using curl or mobile apps), we allow it
     if (!origin) return callback(null, true);
 
     // If the origin is in the allowed list, allow the request
@@ -79,6 +96,8 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.json());
@@ -99,6 +118,7 @@ const path = require("path");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+
 
 // ✅ Logging current session user
 app.use((req, res, next) => {
@@ -130,6 +150,7 @@ app.get("/counselors", async (req, res) => {
     res.status(500).json({ message: "Error fetching counselors", error: error.message });
   }
 });
+
 
 app.get("/signup", (req, res) => {
   res.render("signup.ejs");
