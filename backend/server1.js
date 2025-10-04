@@ -186,17 +186,24 @@ app.use('/videos', videoRoutes);
 app.use('/hub', videoRoutes);
 
 
-app.post("/appointments", async (req, res) => {
+app.post("/appointments", verifyToken, async (req, res) => {
   try {
     console.log(req.body);
     const appointment = new Appointment(req.body);
     await appointment.save();
+    // If userId is provided, push appointment to user's appointments array
+    if (req.body.userId) {
+      const user = await User.findById(req.body.userId);
+      if (user) {
+        user.appointments.push(appointment._id);
+        await user.save();
+      }
+    }
     res.status(201).json({ message: "Appointment booked successfully", appointment });
   } catch (error) {
     res.status(500).json({ message: "Error booking appointment", error: error.message });
   }
 });
-
 
 
 app.get("/signup", (req, res) => {

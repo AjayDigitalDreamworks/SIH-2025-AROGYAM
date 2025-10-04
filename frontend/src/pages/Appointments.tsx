@@ -12,6 +12,7 @@ import api from "@/config/api";
 
 export default function Appointments() {
   const [counselors, setCounselors] = useState([]);
+   const [user, setUser] = useState(null);
   useEffect(() => {
     api.get(`/counselors`)
       .then(response => {
@@ -46,7 +47,7 @@ export default function Appointments() {
       });
       return;
     }
-
+    
     const appointmentPayload = {
       counselorId: selectedCounselor,
       date: selectedDate,
@@ -55,7 +56,8 @@ export default function Appointments() {
       fullName: formData.name,
       email: formData.email,
       phone: formData.phone,
-      discussion: formData.concerns
+      discussion: formData.concerns,
+      userId: user?._id // Add userId to payload
     };
     // console.log('Booking appointment with payload:', appointmentPayload);
     try {
@@ -80,6 +82,21 @@ export default function Appointments() {
       console.error('Error booking appointment:', error);
     }
   };
+  
+  
+
+  useEffect(() => {
+    api
+      .get(`/protected`)
+      .then((response) => {
+        console.log("Fetched user:", response.data.user);
+        setUser(response.data.user);
+
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-6xl">

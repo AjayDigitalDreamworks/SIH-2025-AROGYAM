@@ -2,8 +2,8 @@ import axios from "axios";
 
 // Create an axios instance
 const api = axios.create({
-  // baseURL: "http://localhost:3000", // Base URL for all requests
-  baseURL: "https://sih-2025-arogyam-0cf2.onrender.com"
+  baseURL: "http://localhost:3000", // Base URL for all requests
+  // baseURL: "https://sih-2025-arogyam-0cf2.onrender.com"
 });
 
 // Add an interceptor to add the Authorization header

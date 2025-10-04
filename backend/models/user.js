@@ -125,7 +125,7 @@ const UserSchema = new mongoose.Schema({
   },
   yearOfStudy: {
     type: String,
-    enum: ['Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate', 'Other'],
+    enum: ['1st year', '2nd year', '3rd year', '4th year'],
   },
 
     moodHistory: [
@@ -150,7 +150,7 @@ const UserSchema = new mongoose.Schema({
   ],
   quizScores: [
     {
-      score: { type: Number, required: true },
+      score: { type: Number, required: true }, 
       quiz_type: { type: String, required: true },
       date: { type: Date, default: Date.now },
     },

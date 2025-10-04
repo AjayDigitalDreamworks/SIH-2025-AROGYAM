@@ -177,12 +177,11 @@ const SignUpForm = () => {
                             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select</option>
-                            <option value="Freshman">Freshman</option>
-                            <option value="Sophomore">Sophomore</option>
-                            <option value="Junior">Junior</option>
-                            <option value="Senior">Senior</option>
-                            <option value="Graduate">Graduate</option>
-                            <option value="Other">Other</option>
+                            <option value="Freshman">1st year</option>
+                            <option value="Sophomore">2nd year</option>
+                            <option value="Junior">3rd year</option>
+                            <option value="Senior">4th year</option>
+                           
                         </select>
                     </div>
 
