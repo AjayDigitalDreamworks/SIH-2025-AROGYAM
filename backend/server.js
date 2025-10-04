@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const videoRoutes = require("./routes/videoRoutes");
 const path = require("path");
 const User = require("./models/user");
-
+const Appointment = require("./models/appointment");
 const authRoutes = require("./routes/authRoutes"); 
 const { verifyToken } = require("./middleware/authMiddleware");
 
@@ -78,10 +78,11 @@ app.get('/current_user', verifyToken, async (req, res) => {
 
 
 // Example of another route (appointments)
-const Appointment = require("./models/appointment");
+
 app.post("/appointments", verifyToken, async (req, res) => {
   try {
     console.log(req.body);
+    console.log(req.body.userId);
     const appointment = new Appointment(req.body);
     await appointment.save();
     // If userId is provided, push appointment to user's appointments array
@@ -93,8 +94,10 @@ app.post("/appointments", verifyToken, async (req, res) => {
       }
     }
     res.status(201).json({ message: "Appointment booked successfully", appointment });
+    console.log(appointment);
   } catch (error) {
     res.status(500).json({ message: "Error booking appointment", error: error.message });
+    console.error(error);
   }
 });
 

@@ -57,8 +57,10 @@ export default function Appointments() {
       email: formData.email,
       phone: formData.phone,
       discussion: formData.concerns,
-      userId: user?._id // Add userId to payload
+      userId: user?.userId 
     };
+
+    console.log("payload : ",appointmentPayload);
     // console.log('Booking appointment with payload:', appointmentPayload);
     try {
       const response = await api.post(`/appointments`, appointmentPayload);
