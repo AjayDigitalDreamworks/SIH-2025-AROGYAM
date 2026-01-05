@@ -10,6 +10,8 @@ const User = require("./models/user");
 const Appointment = require("./models/appointment");
 const authRoutes = require("./routes/authRoutes"); 
 const { verifyToken } = require("./middleware/authMiddleware");
+const userRoutes = require('./routes/userRoutes');
+const counsellorAuth = require('./routes/counsellorAuth');
 
 const app = express();
 app.set("view engine", "ejs");
@@ -31,10 +33,16 @@ app.use('/api/quiz', quizRoutes);
 
 app.use('/videos', videoRoutes);
 app.use('/hub', videoRoutes);
+// Expose user list for counsellor dashboard (public for dev)
+app.use('/users', userRoutes);
+
+// Counsellor auth routes
+app.use('/api/counsellor', counsellorAuth);
 
 const corsOptions = {
   origin: [
     "http://localhost:8080", // Frontend ka URL (development mein)
+    "http://localhost:5173", // Vite dev server
     "https://sih-2025-arogyam.onrender.com", // Production ka frontend URL (Render pe)
     "https://sih-2025-arogyam-0cf2.onrender.com" // Dusra Render URL (agar applicable ho)
   ],

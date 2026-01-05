@@ -57,7 +57,8 @@ router.post('/upload', uploadFiles, async (req, res) => {
     });
 
     await video.save();
-    res.status(201).json({ message: 'Upload successful', video });
+    // res.status(201).json({ message: 'Upload successful', video });
+    res.redirect('http://localhost:8080/counsellor/resources');
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Upload failed' });
@@ -99,6 +100,40 @@ router.get('/watch/:id', async (req, res) => {
     res.render('watch', { video });
   } catch (err) {
     res.status(404).json({ error: 'Video not found' });
+  }
+});
+
+// DELETE a resource (video/guide/exercise) by id
+// Note: This endpoint now deletes ONLY the database record and does NOT
+// attempt to remove files from Cloudinary. This avoids accidental removal
+// of media assets that may be in use elsewhere.
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(`DELETE /videos/${id} requested from ${req.ip} - authorization: ${req.headers.authorization || 'none'}`);
+
+    // Defensive: catch cast errors for invalid ObjectId formats
+    let resource;
+    try {
+      resource = await Video.findById(id);
+    } catch (castErr) {
+      console.warn(`Invalid id format for DELETE /videos/${id}:`, castErr.message);
+      return res.status(400).json({ message: 'Invalid resource id format', id });
+    }
+
+    if (!resource) {
+      console.warn(`Resource not found for id ${id}`);
+      return res.status(404).json({ message: 'Resource not found', id });
+    }
+
+    // Delete only from database; do not attempt to delete Cloudinary assets.
+    await Video.findByIdAndDelete(id);
+
+    console.log(`Resource ${id} deleted from DB`);
+    res.json({ message: 'Resource deleted (database only)', id });
+  } catch (error) {
+    console.error('Failed to delete resource', error);
+    res.status(500).json({ message: 'Failed to delete resource', error: error.message });
   }
 });
 

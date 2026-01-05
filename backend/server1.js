@@ -337,6 +337,25 @@ app.post("/logout", (req, res) => {
   });
 });
 
+// Counsellor logout endpoint (for JWT or cookie-based tokens)
+app.post('/api/counsellor/logout', (req, res) => {
+  try {
+    // Clear token cookie if present
+    try { res.clearCookie && res.clearCookie('token'); } catch (e) { /* ignore */ }
+
+    // If using session-based auth, attempt to logout the session too
+    if (req.logout) {
+      req.logout(() => {});
+    }
+
+    console.log('Counsellor logged out');
+    res.json({ message: 'Counsellor logged out' });
+  } catch (err) {
+    console.error('Counsellor logout error', err);
+    res.status(500).json({ message: 'Logout failed' });
+  }
+});
+
 const communityRoutes = require('./routes/community');
 app.use('/api/community', communityRoutes);
 

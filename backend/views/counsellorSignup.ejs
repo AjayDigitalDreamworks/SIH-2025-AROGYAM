@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Counsellor Signup</title>
+  <style>
+    body { background: #f7f8fa; font-family: 'Segoe UI', Arial, sans-serif; }
+    .container { max-width: 520px; margin: 40px auto; background: #fff; padding: 28px; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    label { display:block; margin-bottom:6px; color:#374151; }
+    input, select { width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:14px; }
+    button { background:#1d4ed8; color:#fff; padding:10px 14px; border-radius:6px; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 style="margin-top:0;">Counsellor Signup</h2>
+    <form id="counsellorSignup">
+      <label>Username *</label>
+      <input name="username" required />
+
+      <label>Email *</label>
+      <input name="email" type="email" required />
+
+      <label>Password *</label>
+      <input name="password" type="password" required />
+
+      <label>Full name *</label>
+      <input name="name" required />
+
+      <label>Specialty (e.g., Anxiety) *</label>
+      <input name="specialty" required />
+
+      <label>Years of experience *</label>
+      <input name="experience" required />
+
+      <label>Profile image (emoji or URL)</label>
+      <input name="image" />
+
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <button type="submit">Sign up</button>
+      </div>
+    </form>
+    <p style="margin-top:12px;color:#6b7280;">Already have an account? <a href="/api/counsellor/login">Login</a></p>
+  </div>
+
+  <script>
+    document.getElementById('counsellorSignup').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const body = Object.fromEntries(form.entries());
+
+      try {
+        const res = await fetch('/api/counsellor/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || 'Signup successful');
+          window.location.href = '/api/counsellor/login';
+        } else {
+          alert(data.message || 'Signup failed');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('An error occurred');
+      }
+    });
+  </script>
+</body>
+</html>

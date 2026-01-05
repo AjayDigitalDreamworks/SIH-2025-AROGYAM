@@ -1,7 +1,28 @@
 import React from "react";
-import { Bell, MessageCircle, ChevronDown, Search, Heart } from "lucide-react";
+import { Bell, MessageCircle, ChevronDown, Search, Heart, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import api from "@/config/api";
 
 export default function AppHeader() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      // Attempt server-side logout for both user and counsellor endpoints (no-op if not logged in)
+      try { await api.post('/api/auth/logout'); } catch (e) { /* ignore */ }
+      try { await api.post('/api/counsellor/logout'); } catch (e) { /* ignore */ }
+    } catch (err) {
+      console.warn('Server logout failed', err);
+    } finally {
+      // Clear client-side auth and redirect
+      localStorage.removeItem('token');
+      toast({ title: 'Logged out', description: 'You have been logged out.' });
+      navigate('/login');
+    }
+  }
+
   return (
     <header className="bg-white w-full flex items-center justify-between border-b border-gray-200 shadow-sm">
       {/* Left: Logo and Product Name */}
@@ -89,6 +110,12 @@ export default function AppHeader() {
             </div>
           </div>
           <ChevronDown className="w-4 h-4 text-gray-400" />
+        </div>
+        <div className="ml-4">
+          <button onClick={handleLogout} className="inline-flex items-center gap-2 text-sm text-red-600 hover:underline">
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </div>
     </header>

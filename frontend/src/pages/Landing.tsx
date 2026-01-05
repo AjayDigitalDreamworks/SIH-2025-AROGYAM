@@ -40,14 +40,19 @@ const Landing = () => {
             </Button> */}
 
             <Button className="bg-primary hover:bg-primary/90">
-            <a href="/signup">signup</a>
-
-
+              <a href="/signup">signup</a>
             </Button>
-             <Button className="bg-primary hover:bg-primary/90">
-            <a href="/login">login</a>
 
+            <Button className="bg-primary hover:bg-primary/90">
+              <a href="/login">login</a>
+            </Button>
 
+            <Button variant="ghost" className="text-muted-foreground hover:text-primary" asChild>
+              <a href="/counsellor/login">Counsellor Login</a>
+            </Button>
+
+            <Button variant="ghost" className="text-muted-foreground hover:text-primary" asChild>
+              <a href="/counsellor/signup">Counsellor Signup</a>
             </Button>
           </div>
         </div>
@@ -135,6 +140,16 @@ const Landing = () => {
                   <Link to="/landing-booking">
                     <Calendar className="w-5 h-5 mr-2" />
                     Book Appointment
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  asChild
+                >
+                  <Link to="/counsellor">
+                    <Users className="w-5 h-5 mr-2" />
+                    Counsellor Dashboard
                   </Link>
                 </Button>
               </div>

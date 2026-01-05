@@ -125,7 +125,7 @@ const UserSchema = new mongoose.Schema({
   },
   yearOfStudy: {
     type: String,
-    enum: ['1st year', '2nd year', '3rd year', '4th year'],
+    enum: ['Freshman','Sophomore','Junior','Senior','1st year', '2nd year', '3rd year', '4th year', 'Graduate','Other'],
   },
 
     moodHistory: [

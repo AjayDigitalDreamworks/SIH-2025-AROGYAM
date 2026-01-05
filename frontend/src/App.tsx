@@ -25,6 +25,14 @@ import LandingBooking from "./pages/LandingBooking";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 
+// Counsellor pages
+import CounsellorDashboard from "./pages/CounsellorDashboard";
+import StudentProgress from "./pages/StudentProgress";
+import Volunteer from "./pages/Volunteer";
+import CounsellorResources from "./pages/CounsellorResources";
+import CounsellorSignup from "./pages/CounsellorSignup";
+import CounsellorLogin from "./pages/CounsellorLogin";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,6 +56,10 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             
+            {/* Counsellor auth (signup/login) */}
+            <Route path="/counsellor/signup" element={<CounsellorSignup />} />
+            <Route path="/counsellor/login" element={<CounsellorLogin />} />
+            
             {/* Dashboard pages (post-login with Sidebar & Header) */}
             <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
             <Route path="/chat" element={<Layout><Chat /></Layout>} />
@@ -61,6 +73,12 @@ const App = () => (
             <Route path="/exercise" element={<Layout><Exercise /></Layout>} />
             <Route path="/crisis" element={<Layout><Crisis /></Layout>} />
             <Route path="/feedback" element={<Layout><Feedback /></Layout>} />
+
+            {/* Counsellor routes */}
+            <Route path="/counsellor" element={<Layout><CounsellorDashboard /></Layout>} />
+            <Route path="/counsellor/student-progress" element={<Layout><StudentProgress /></Layout>} />
+            <Route path="/counsellor/resources" element={<Layout><CounsellorResources /></Layout>} />
+            <Route path="/counsellor/volunteer" element={<Layout><Volunteer /></Layout>} />
 
             {/* Catch-all for unmatched routes */}
             <Route path="*" element={<NotFound />} />

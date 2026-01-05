@@ -1,7 +1,9 @@
 import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { MindWellSidebar } from "@/components/MindWellSidebar";
+import { CounsellorSidebar } from "@/components/CounsellorSidebar";
 import { Bell, Search, User } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -14,7 +16,12 @@ export function Layout({ children }: LayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <MindWellSidebar />
+        {/* Choose sidebar by route: counsellor routes use the counsellor sidebar */}
+        {(() => {
+          const location = useLocation();
+          const isCounsellor = location.pathname.startsWith("/counsellor");
+          return isCounsellor ? <CounsellorSidebar /> : <MindWellSidebar />;
+        })()}
 
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Header */}
