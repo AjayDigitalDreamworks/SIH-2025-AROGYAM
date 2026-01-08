@@ -5,46 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const resourcesData = [
-  {
-    id: 1,
-    type: "Article",
-    title: "Managing Academic Stress",
-    description: "Learn effective techniques to handle academic pressure and maintain balance.",
-    duration: "5 min read",
-    image: "🎓",
-    action: "Read More",
-    bgGradient: "from-blue-100 to-blue-50"
-  },
-  {
-    id: 2,
-    type: "Video", 
-    title: "Guided Meditation for Students",
-    description: "A 10 minute meditation session designed specifically for busy students.",
-    duration: "10 min watch",
-    image: "🧘‍♀️",
-    action: "Watch Now",
-    bgGradient: "from-green-100 to-green-50"
-  },
-  {
-    id: 3,
-    type: "Guide",
-    title: "Better Sleep Habits",
-    description: "Improve your sleep quality with these evidence-based strategies.",
-    duration: "7 min read", 
-    image: "😴",
-    action: "Read Guide",
-    bgGradient: "from-purple-100 to-purple-50"
-  }
-];
-
 const typeColors = {
   Article: "bg-primary text-primary-foreground",
-  Video: "bg-secondary text-secondary-foreground", 
+  Video: "bg-secondary text-secondary-foreground",
   Guide: "bg-accent text-accent-foreground"
 };
 
-export function LatestResources() {
+export function LatestResources({ resources = [] }:{ resources?: any[] }) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -60,40 +27,44 @@ export function LatestResources() {
       
       {/* Resources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {resourcesData.map((resource) => (
-          <Card key={resource.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
-            {/* Image Section */}
-            <div className={`h-48 bg-gradient-to-br ${resource.bgGradient} flex items-center justify-center text-6xl`}>
-              {resource.image}
-            </div>
-            
-            {/* Content Section */}
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <Badge className={typeColors[resource.type as keyof typeof typeColors]}>
-                  {resource.type}
-                </Badge>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  {resource.duration}
+        {resources.length === 0 ? (
+          <div className="text-sm text-muted-foreground">No resources available</div>
+        ) : (
+          resources.map((resource:any) => (
+            <Card key={resource._id || resource.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
+              {/* Image Section */}
+              <div className={`h-48 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-6xl`}>
+                {resource.thumbnailUrl || resource.image || '📚'}
+              </div>
+              
+              {/* Content Section */}
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Badge className={typeColors[resource.type as keyof typeof typeColors] || 'bg-muted'}>
+                    {resource.type || 'Article'}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    {resource.duration || resource.video?.duration || ''}
+                  </div>
                 </div>
+                
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                    {resource.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {resource.description}
+                  </p>
+                </div>
+                
+                <Button className="w-full group-hover:shadow-md transition-all">
+                  {resource.action || 'View'}
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                  {resource.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {resource.description}
-                </p>
-              </div>
-              
-              <Button className="w-full group-hover:shadow-md transition-all">
-                {resource.action}
-              </Button>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

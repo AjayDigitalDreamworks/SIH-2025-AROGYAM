@@ -15,85 +15,77 @@ import { useState, useEffect } from "react";
 import Mood from "./Mood";
 import api from "@/config/api";
 
-const wellnessData = [
-	{
-		title: "Mood Today",
-		subtitle: "Good - Keep it up!",
-		icon: Heart,
-		iconBgColor: "bg-wellness-green",
-		progress: 85,
-		progressColor: "green",
-		emoji: "💚",
-	},
-	{
-		title: "Sleep Quality",
-		subtitle: "7.5 hours last night",
-		icon: Moon,
-		iconBgColor: "bg-wellness-blue",
-		progress: 75,
-		progressColor: "blue",
-		emoji: "🌙",
-	},
-	{
-		title: "Study Stress",
-		subtitle: "Moderate level",
-		icon: GraduationCap,
-		iconBgColor: "bg-wellness-orange",
-		progress: 60,
-		progressColor: "orange",
-		emoji: "🎓",
-	},
-	{
-		title: "Streak",
-		subtitle: "12 days checking in",
-		icon: Flame,
-		iconBgColor: "bg-wellness-yellow",
-		progress: 100,
-		progressColor: "yellow",
-		emoji: "🔥",
-	},
-];
-
+// Wellness data and related datasets will be stored in component state
 export default function Dashboard() {
 	const [user, setUser] = useState(null);
-const [error, setError] = useState(null);
+	const [error, setError] = useState(null);
+	const [wellnessData, setWellnessData] = useState<any[]>([]);
+	const [appointmentsData, setAppointmentsData] = useState<any[]>([]);
+	const [resourcesData, setResourcesData] = useState<any[]>([]);
+	const [communitiesData, setCommunitiesData] = useState<any[]>([]);
 
   useEffect(() => {
-    // Retrieve the token from localStorage
+    // Call dashboard endpoint to fetch user data and related entities
     const token = localStorage.getItem("token");
 
-    // If no token, redirect to login or show an error
     if (!token) {
       setError("No token found, please log in again.");
-      window.location.href = "/login"; // Redirect to login page if token is missing
+      window.location.href = "/login";
       return;
     }
 
-    console.log("Using token:", token);
-
-    // Make the API request to fetch the current user
     api
-      .get("/protected", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Send the token in the Authorization header
-        },
-      })
-      .then((response) => {
-        console.log("Fetched user:", response.data.user);
-        setUser(response.data.user); // Set the user state on success
-      })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
+      .get('/users/dashboard')
+      .then((res) => {
+        const { user, latestMood, latestSleep, upcomingAppointments, quizScores } = res.data;
+        setUser(user);
+        setAppointmentsData(upcomingAppointments || []);
 
-        // Handle specific error types (like token expiry or invalid token)
-        if (error.response && error.response.status === 401) {
-          setError("Session expired. Please log in again.");
-          localStorage.removeItem("token"); // Remove expired token from localStorage
-          window.location.href = "/login"; // Redirect to login page
+        // Build wellness cards
+        const moodProgress = latestMood ? Math.round((latestMood.mood / 5) * 100) : 0;
+        const sleepProgress = latestSleep ? Math.round(Math.min(100, (latestSleep.hours / 8) * 100)) : 0;
+        const studyStress = quizScores && quizScores.length ? Math.round(Math.min(100, quizScores[0].score || 50)) : 50;
+
+        const streak = (() => {
+          // Compute simple streak based on recent mood entries counting consecutive days with mood >=3
+          if (!user.moodHistory || !user.moodHistory.length) return 0;
+          const sorted = [...user.moodHistory].sort((a:any,b:any)=> new Date(b.date).getTime() - new Date(a.date).getTime());
+          let curr = new Date();
+          let streakCount = 0;
+          for (const entry of sorted) {
+            const entryDate = new Date(entry.date);
+            const diffDays = Math.floor((curr.setHours(0,0,0,0) - new Date(entryDate).setHours(0,0,0,0)) / (1000*60*60*24));
+            if (diffDays === streakCount && entry.mood >= 3) {
+              streakCount += 1;
+            } else if (diffDays > streakCount) {
+              break;
+            }
+          }
+          return streakCount;
+        })();
+
+        setWellnessData([
+          { title: 'Mood Today', subtitle: latestMood ? `Mood ${latestMood.mood}` : 'No data', icon: Heart, iconBgColor: 'bg-wellness-green', progress: moodProgress, progressColor: 'green', emoji: '💚' },
+          { title: 'Sleep Quality', subtitle: latestSleep ? `${latestSleep.hours} hrs` : 'No data', icon: Moon, iconBgColor: 'bg-wellness-blue', progress: sleepProgress, progressColor: 'blue', emoji: '🌙' },
+          { title: 'Study Stress', subtitle: `${studyStress}%`, icon: GraduationCap, iconBgColor: 'bg-wellness-orange', progress: studyStress, progressColor: 'orange', emoji: '🎓' },
+          { title: 'Streak', subtitle: `${streak} days`, icon: Flame, iconBgColor: 'bg-wellness-yellow', progress: Math.min(100, streak), progressColor: 'yellow', emoji: '🔥' }
+        ]);
+      })
+      .catch((err) => {
+        console.error('Error fetching dashboard data', err);
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
         } else {
-          setError("Error fetching user. Please try again.");
+          setError('Failed to load dashboard');
         }
       });
+
+    // Fetch latest resources
+    api.get('/videos/videos').then(r => setResourcesData((r.data || []).slice(0,3))).catch(()=>{});
+
+    // Fetch communities
+    api.get('/api/community').then(r => setCommunitiesData(r.data.communities || [])).catch(()=>{});
   }, []);
 
 	return (
@@ -138,24 +130,22 @@ const [error, setError] = useState(null);
 
 				{/* Upcoming Appointments */}
 				<div className="mb-8">
-					<UpcomingAppointments />
-				</div>
+				<UpcomingAppointments appointments={appointmentsData} />
+			</div>
 
-				{/* Quick Actions */}
-				<div className="mb-8">
-					<QuickActions />
-				</div>
+			{/* Quick Actions */}
+			<div className="mb-8">
+				<QuickActions />
+			</div>
 
-				{/* Latest Resources */}
-				<div className="mb-8">
-					<LatestResources />
-				</div>
+			{/* Latest Resources */}
+			<div className="mb-8">
+				<LatestResources resources={resourcesData} />
+			</div>
 
-				{/* Community Highlights */}
-				<div className="mb-8">
-					<CommunityHighlights />
-				</div>
-
+			{/* Community Highlights */}
+			<div className="mb-8">
+				<CommunityHighlights communities={communitiesData} />
 				{/* Wellness Tip */}
 				<div className="mb-8">
 					<WellnessTip />
@@ -170,6 +160,7 @@ const [error, setError] = useState(null);
 				<div>
 					<EmergencySupport />
 				</div>
+			</div>
 			</main>
 		</div>
 	);

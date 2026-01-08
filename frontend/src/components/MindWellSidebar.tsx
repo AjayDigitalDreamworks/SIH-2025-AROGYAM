@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainMenuItems = [
-  { title: "Dashboard", url: "/", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "AI Chatbot", url: "/chat", icon: MessageCircle },
   { title: "Book Appointment", url: "/appointments", icon: Calendar },
   { title: "Resource Hub", url: "/resources", icon: BookOpen },
@@ -35,15 +35,15 @@ const mainMenuItems = [
 
 const wellnessToolsItems = [
   { title: "Quizzes & Games", url: "/quizzes", icon: GamepadIcon },
-  { title: "Germs Game", url: "/game", icon: GamepadIcon },
+  
   { title: "Mood Tracker", url: "/mood", icon: Heart },
   { title: "Sleep Tracker", url: "/sleep", icon: Moon },
   { title: "Exercise Plans", url: "/exercise", icon: Dumbbell },
 ];
 
 const supportItems = [
-  { title: "Crisis Helpline", url: "/crisis", icon: Phone },
-  { title: "Review & Feedback", url: "/feedback", icon: Star },
+  { title: "Crisis Helpline", url: "/crisis", icon: Phone }
+  
 ];
 
 export function MindWellSidebar() {

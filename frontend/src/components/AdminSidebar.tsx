@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Home, Users, BookOpen, BarChart2, Calendar } from "lucide-react";
+import { Home, Users, BookOpen, Phone } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -8,27 +7,23 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const counsellorItems = [
-  { title: "Home", url: "/counsellor", icon: Home },
-  { title: "Volunteer", url: "/counsellor/volunteer", icon: Users },
-  { title: "Resources", url: "/counsellor/resources", icon: BookOpen },
-  { title: "Student Progress", url: "/counsellor/student-progress", icon: BarChart2 },
-  { title: "Appointments", url: "/counsellor/appointments", icon: Calendar },
+const adminItems = [
+  { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Register Counsellor", url: "/admin/register-counsellor", icon: Users },
+  { title: "Resources", url: "/admin/resources", icon: BookOpen },
+  { title: "Emergency Management", url: "/admin/emergency", icon: Phone },
 ];
 
-export function CounsellorSidebar() {
+export function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
-
-  const isActive = (path: string) =>
-    currentPath === path || (path !== "/" && currentPath.startsWith(path));
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -46,7 +41,7 @@ export function CounsellorSidebar() {
             {!isCollapsed && (
               <div>
                 <h1 className="text-xl font-bold text-primary">Arogyam</h1>
-                <p className="text-xs text-muted-foreground">Counsellor Portal</p>
+                <p className="text-xs text-muted-foreground">Admin Portal</p>
               </div>
             )}
           </div>
@@ -58,12 +53,12 @@ export function CounsellorSidebar() {
           )}
           <SidebarGroupContent>
             <SidebarMenu className={`${isCollapsed ? "flex items-center" : "space-y-2"}`}>
-              {counsellorItems.map((item) => (
+              {adminItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/counsellor"}
+                      end={item.url === "/admin"}
                       className={({ isActive }) => `
                         flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
                         ${getNavCls({ isActive })}

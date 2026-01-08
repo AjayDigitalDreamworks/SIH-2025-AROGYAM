@@ -2,25 +2,33 @@ import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { MindWellSidebar } from "@/components/MindWellSidebar";
 import { CounsellorSidebar } from "@/components/CounsellorSidebar";
+import { AdminSidebar } from "@/components/AdminSidebar";
 import { Bell, Search, User } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import api from "@/config/api";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
-}
+} 
 
 export function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         {/* Choose sidebar by route: counsellor routes use the counsellor sidebar */}
         {(() => {
           const location = useLocation();
-          const isCounsellor = location.pathname.startsWith("/counsellor");
-          return isCounsellor ? <CounsellorSidebar /> : <MindWellSidebar />;
+          const path = location.pathname || "";
+          if (path.startsWith("/counsellor")) return <CounsellorSidebar />;
+          if (path.startsWith("/admin")) return <AdminSidebar />;
+          return <MindWellSidebar />;
         })()}
 
         <div className="flex-1 flex flex-col min-w-0">
@@ -61,6 +69,28 @@ export function Layout({ children }: LayoutProps) {
                       SC
                     </AvatarFallback>
                   </Avatar>
+                </div>
+
+                {/* Logout Button */}
+                <div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600"
+                    onClick={async () => {
+                      try {
+                        await api.post('/api/auth/logout');
+                      } catch (e) {
+                        // ignore server errors
+                      } finally {
+                        localStorage.removeItem('token');
+                        toast({ title: 'Logged out', description: 'You have been logged out.' });
+                        navigate('/login');
+                      }
+                    }}
+                  >
+                    Logout
+                  </Button>
                 </div>
               </div>
             </div>

@@ -117,23 +117,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  // Extract the token from cookies
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid or expired token" });
-    }
-    req.user = decoded;  // Attach decoded user data to the request
-    next();
-  });
-};
+// Use centralized auth middleware (supports cookies & Authorization header, and token blacklist)
+const { verifyToken, blacklistToken } = require('../middleware/authMiddleware');
 
 
 // Example protected route
@@ -141,11 +126,12 @@ router.get('/protected', verifyToken, (req, res) => {
   res.json({ message: 'You have access to this protected route', user: req.user });
 });
 
-// Logout Route: clears cookie-based token (if used)
+// Logout Route: revoke token (from header or cookie) and clear cookie
 router.post('/logout', (req, res) => {
   try {
-    // Clear cookie if token stored in cookie
-    res.clearCookie && res.clearCookie('token');
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    if (token) blacklistToken(token);
+    if (res.clearCookie) res.clearCookie('token');
     res.json({ message: 'Logged out' });
   } catch (err) {
     console.error('Logout error', err);

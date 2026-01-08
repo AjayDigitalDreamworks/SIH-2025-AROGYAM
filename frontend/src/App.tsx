@@ -15,7 +15,7 @@ import Mood from "./pages/Mood";
 import Sleep from "./pages/Sleep";
 import Exercise from "./pages/Exercise";
 import Crisis from "./pages/Crisis";
-import Feedback from "./pages/Feedback";
+
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Games from "./pages/Games";
@@ -32,6 +32,13 @@ import Volunteer from "./pages/Volunteer";
 import CounsellorResources from "./pages/CounsellorResources";
 import CounsellorSignup from "./pages/CounsellorSignup";
 import CounsellorLogin from "./pages/CounsellorLogin";
+import CounsellorAppointments from "./pages/CounsellorAppointments";
+
+// Admin pages
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminRegisterCounsellor from "./pages/AdminRegisterCounsellor";
+import AdminResources from "./pages/AdminResources";
+import AdminEmergency from "./pages/AdminEmergency";
 
 const queryClient = new QueryClient();
 
@@ -72,13 +79,20 @@ const App = () => (
             <Route path="/sleep" element={<Layout><Sleep /></Layout>} />
             <Route path="/exercise" element={<Layout><Exercise /></Layout>} />
             <Route path="/crisis" element={<Layout><Crisis /></Layout>} />
-            <Route path="/feedback" element={<Layout><Feedback /></Layout>} />
+          
 
             {/* Counsellor routes */}
             <Route path="/counsellor" element={<Layout><CounsellorDashboard /></Layout>} />
             <Route path="/counsellor/student-progress" element={<Layout><StudentProgress /></Layout>} />
             <Route path="/counsellor/resources" element={<Layout><CounsellorResources /></Layout>} />
             <Route path="/counsellor/volunteer" element={<Layout><Volunteer /></Layout>} />
+            <Route path="/counsellor/appointments" element={<Layout><CounsellorAppointments /></Layout>} />
+
+            {/* Admin routes (no auth required initially) */}
+            <Route path="/admin" element={<Layout><AdminDashboard /></Layout>} />
+            <Route path="/admin/register-counsellor" element={<Layout><AdminRegisterCounsellor /></Layout>} />
+            <Route path="/admin/resources" element={<Layout><AdminResources /></Layout>} />
+            <Route path="/admin/emergency" element={<Layout><AdminEmergency /></Layout>} />
 
             {/* Catch-all for unmatched routes */}
             <Route path="*" element={<NotFound />} />

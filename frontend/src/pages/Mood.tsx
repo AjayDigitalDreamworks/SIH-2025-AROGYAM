@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar } from "@/components/ui/calendar";
 import api from "@/config/api";
 
 import { 
   Heart, 
   TrendingUp, 
-  Calendar as CalendarIcon, 
   BarChart3,
   Plus,
   Filter,
@@ -18,7 +16,6 @@ import {
   Share2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
 
 const moods = [
   { emoji: "😭", label: "Very Sad", value: 1, color: "bg-red-500" },
@@ -28,33 +25,8 @@ const moods = [
   { emoji: "😍", label: "Great", value: 5, color: "bg-green-600" },
 ];
 
-const moodHistory = [
-  { date: '2025-01-15', mood: 4, note: 'Had a great study session with friends!' },
-  { date: '2025-01-14', mood: 3, note: 'Feeling okay, but a bit stressed about upcoming exam.' },
-  { date: '2025-01-13', mood: 5, note: 'Amazing day! Got good news about internship.' },
-  { date: '2025-01-12', mood: 2, note: 'Feeling down, homesick today.' },
-  { date: '2025-01-11', mood: 4, note: 'Good productive day, worked out in the morning.' },
-  { date: '2025-01-10', mood: 3, note: 'Average day, nothing special happened.' },
-  { date: '2025-01-09', mood: 4, note: 'Nice weather, spent time outdoors.' },
-];
+// initial placeholders will be replaced by data from /api/mood
 
-const weeklyData = [
-  { day: 'Mon', mood: 3, color: 'bg-yellow-500' },
-  { day: 'Tue', mood: 2, color: 'bg-orange-500' },
-  { day: 'Wed', mood: 4, color: 'bg-green-500' },
-  { day: 'Thu', mood: 5, color: 'bg-green-600' },
-  { day: 'Fri', mood: 4, color: 'bg-green-500' },
-  { day: 'Sat', mood: 3, color: 'bg-yellow-500' },
-  { day: 'Sun', mood: 4, color: 'bg-green-500' },
-];
-
-const monthlyInsights = {
-  averageMood: 3.7,
-  bestDay: 'Thursday',
-  mostCommonMood: 'Good 😊',
-  improvementTrend: '+12%',
-  totalEntries: 28
-};
 
 
 interface MoodProps {
@@ -63,59 +35,51 @@ interface MoodProps {
 export default function Mood({ userId }: MoodProps) {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [moodNote, setMoodNote] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [user, setUser] = useState(null);
+  const [weekly, setWeekly] = useState<Array<{date:string,mood:number|null}>>([]);
+  const [history, setHistory] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>({ averageMood: null, totalEntries: 0, streak: 0 });
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    api
-      .get(`/protected`)
-      .then((response) => {
-        console.log("Fetched user:", response.data.user);
-        setUser(response.data.user);
-
-      })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
-      });
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get('/api/mood');
+        setHistory(res.data.moodHistory || []);
+        setWeekly(res.data.weekly || []);
+        setSummary(res.data.summary || { averageMood: null, totalEntries: 0, streak: 0 });
+      } catch (err) {
+        console.error('Failed to fetch mood data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
   }, []);
 
   const handleMoodSubmit = async () => {
     if (!selectedMood) {
-      toast({
-        title: "Please select a mood",
-        description: "Choose how you're feeling today.",
-        variant: "destructive",
-      });
+      toast({ title: "Please select a mood", description: "Choose how you're feeling today.", variant: "destructive" });
       return;
     }
-    if (!user?.userId) {
-      toast({
-        title: "User not found",
-        description: "Please log in again.",
-        variant: "destructive",
-      });
-      return;
-    }
+
     try {
-      await api.post(`/api/mood`, {
-        userId: user.userId,
-        mood: selectedMood,
-        note: moodNote,
-        date: selectedDate || new Date()
-      });
-      toast({
-        title: "Mood Recorded!",
-        description: "Your mood has been saved to your wellness journey.",
-      });
+      const r = await api.post('/api/mood', { mood: selectedMood, note: moodNote });
+      toast({ title: 'Mood Recorded!', description: 'Your mood has been saved.' });
       setSelectedMood(null);
       setMoodNote('');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Could not save your mood. Please try again.",
-        variant: "destructive",
-      });
+
+      // refresh data
+      setHistory(r.data.moodHistory || []);
+      // re-fetch summary / weekly
+      const s = await api.get('/api/mood');
+      setHistory(s.data.moodHistory || []);
+      setWeekly(s.data.weekly || []);
+      setSummary(s.data.summary || { averageMood: null, totalEntries: 0, streak: 0 });
+    } catch (err) {
+      console.error('Save mood failed', err);
+      toast({ title: 'Error', description: 'Could not save your mood. Please try again.', variant: 'destructive' });
     }
   };
 
@@ -127,6 +91,20 @@ export default function Mood({ userId }: MoodProps) {
   const getMoodEmoji = (value: number) => {
     const mood = moods.find(m => m.value === value);
     return mood?.emoji || '😐';
+  };
+
+  // derive weekly data for charting
+  const weeklyData = weekly.map(item => ({
+    day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
+    mood: item.mood || 0,
+    color: getMoodColor(item.mood || 0),
+  }));
+
+  const monthlyInsights = {
+    averageMood: summary?.averageMood ? (Math.round(summary.averageMood * 10) / 10) : '-',
+    bestDay: (weeklyData.length && weeklyData.reduce((best, d) => d.mood > (best.mood||0) ? d : best, { mood: 0 }))?.day || '-',
+    improvementTrend: summary?.averageMood ? `${Math.round(summary.averageMood * 10) / 10}` : '-',
+    totalEntries: summary?.totalEntries || 0,
   };
 
   return (
@@ -225,19 +203,19 @@ export default function Mood({ userId }: MoodProps) {
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
                     <div className="text-center">
-                      <div className="text-lg font-semibold">3.6</div>
+                      <div className="text-lg font-semibold">{monthlyInsights.averageMood}</div>
                       <div className="text-xs text-muted-foreground">Avg Mood</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-semibold">4</div>
+                      <div className="text-lg font-semibold">{monthlyInsights.bestDay}</div>
                       <div className="text-xs text-muted-foreground">Best Day</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-semibold">7</div>
+                      <div className="text-lg font-semibold">{monthlyInsights.totalEntries}</div>
                       <div className="text-xs text-muted-foreground">Days Tracked</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-green-600">+8%</div>
+                      <div className="text-lg font-semibold text-green-600">{monthlyInsights.improvementTrend}</div>
                       <div className="text-xs text-muted-foreground">vs Last Week</div>
                     </div>
                   </div>
@@ -296,9 +274,17 @@ export default function Mood({ userId }: MoodProps) {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Mood History</h3>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={async ()=>{
+                      try{
+                        const s = await api.get('/api/mood');
+                        setHistory(s.data.moodHistory || []);
+                        setWeekly(s.data.weekly || []);
+                        setSummary(s.data.summary || { averageMood: null, totalEntries: 0, streak: 0 });
+                        toast({ title: 'Refreshed' });
+                      }catch(e){ toast({ title:'Error', variant:'destructive' }); }
+                    }}>
                       <Filter className="w-4 h-4 mr-2" />
-                      Filter
+                      Refresh
                     </Button>
                     <Button variant="outline" size="sm">
                       <Download className="w-4 h-4 mr-2" />
@@ -308,32 +294,27 @@ export default function Mood({ userId }: MoodProps) {
                 </div>
                 
                 <div className="space-y-3">
-                  {moodHistory.map((entry, index) => (
-                    <div key={index} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50">
-                      <div className="flex flex-col items-center">
-                        <div className="text-2xl mb-1">{getMoodEmoji(entry.mood)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(entry.date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
+                  {history.length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No mood entries yet. Record today's mood to get started.</div>
+                  ) : (
+                    history.map((entry, index) => (
+                      <div key={index} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50">
+                        <div className="flex flex-col items-center">
+                          <div className="text-2xl mb-1">{getMoodEmoji(entry.mood)}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">{moods.find(m => m.value === entry.mood)?.label}</Badge>
+                            <span className="text-xs text-muted-foreground">{new Date(entry.date).toLocaleDateString('en-US', { weekday: 'long' })}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{entry.note}</p>
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-xs">
-                            {moods.find(m => m.value === entry.mood)?.label}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(entry.date).toLocaleDateString('en-US', { 
-                              weekday: 'long'
-                            })}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{entry.note}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </Card>
             </TabsContent>
@@ -342,32 +323,22 @@ export default function Mood({ userId }: MoodProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Calendar */}
-          <Card className="wellness-card p-6">
-            <h3 className="text-lg font-semibold mb-4">Mood Calendar</h3>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border-0"
-            />
-          </Card>
-
+  
           {/* Quick Stats */}
           <Card className="wellness-card p-6">
             <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Current Streak</span>
-                <span className="font-semibold">12 days</span>
+                <span className="font-semibold">{summary.streak || 0} days</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">This Month</span>
-                <span className="font-semibold">28 entries</span>
+                <span className="text-sm text-muted-foreground">Entries</span>
+                <span className="font-semibold">{summary.totalEntries || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Avg Rating</span>
-                <span className="font-semibold">3.7/5</span>
+                <span className="font-semibold">{summary.averageMood ? Math.round(summary.averageMood*10)/10 : '-'}/5</span>
               </div>
             </div>
           </Card>

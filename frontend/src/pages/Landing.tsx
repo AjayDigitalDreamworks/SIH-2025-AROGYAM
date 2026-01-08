@@ -47,13 +47,13 @@ const Landing = () => {
               <a href="/login">login</a>
             </Button>
 
-            <Button variant="ghost" className="text-muted-foreground hover:text-primary" asChild>
-              <a href="/counsellor/login">Counsellor Login</a>
+            {/* Admin dashboard access (no auth required initially) */}
+            <Button variant="outline" className="text-muted-foreground hover:text-primary">
+              <a href="/admin">Admin</a>
             </Button>
 
-            <Button variant="ghost" className="text-muted-foreground hover:text-primary" asChild>
-              <a href="/counsellor/signup">Counsellor Signup</a>
-            </Button>
+        
+            
           </div>
         </div>
       </header>
@@ -127,7 +127,7 @@ const Landing = () => {
                   className="bg-primary hover:bg-primary/90"
                   asChild
                 >
-                  <Link to="/dashboard">
+                  <Link to="/login">
                     <MessageCircle className="w-5 h-5 mr-2" />
                     Start Chat Now
                   </Link>
@@ -137,7 +137,7 @@ const Landing = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to="/landing-booking">
+                  <Link to="/login">
                     <Calendar className="w-5 h-5 mr-2" />
                     Book Appointment
                   </Link>
@@ -147,7 +147,7 @@ const Landing = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to="/counsellor">
+                  <Link to="/counsellor/login">
                     <Users className="w-5 h-5 mr-2" />
                     Counsellor Dashboard
                   </Link>
@@ -218,7 +218,7 @@ const Landing = () => {
                   Schedule private one-on-one sessions with licensed counselors
                 </p>
                 <Button className="w-full bg-primary hover:bg-primary/90" asChild>
-                  <Link to="/appointments">Book Now</Link>
+                  <Link to="/login">Book Now</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -233,7 +233,7 @@ const Landing = () => {
                   Access videos, guides, and tools for mental wellness
                 </p>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link to="/resources">Explore</Link>
+                  <Link to="/login">Explore</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -248,7 +248,7 @@ const Landing = () => {
                   Connect with other students in a safe, moderated space
                 </p>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link to="/community">Join Community</Link>
+                  <Link to="/login">Join Community</Link>
                 </Button>
               </CardContent>
             </Card>

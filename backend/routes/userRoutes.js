@@ -46,4 +46,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /users/dashboard - return aggregated data for current user (protected)
+router.get('/dashboard', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId)
+      .select('-password -__v')
+      .populate({ path: 'appointments' });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Latest mood and sleep entries
+    const latestMood = user.moodHistory && user.moodHistory.length ? user.moodHistory[user.moodHistory.length - 1] : null;
+    const latestSleep = user.sleepHistory && user.sleepHistory.length ? user.sleepHistory[user.sleepHistory.length - 1] : null;
+
+    // Upcoming appointments - return next 5
+    const upcomingAppointments = (user.appointments || []).slice(0, 5);
+
+    // Recent quiz scores
+    const quizScores = (user.quizScores || []).slice(-5).reverse();
+
+    res.json({ user, latestMood, latestSleep, upcomingAppointments, quizScores });
+  } catch (err) {
+    console.error('Error fetching dashboard data', err);
+    res.status(500).json({ message: 'Error fetching dashboard data', error: err.message });
+  }
+});
+
 module.exports = router;

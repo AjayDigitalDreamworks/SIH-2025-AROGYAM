@@ -75,17 +75,31 @@ export default function Appointments() {
       setSelectedTime('');
       setAppointmentType('');
       setFormData({ name: '', email: '', phone: '', concerns: '' });
-    } catch (error) {
-      toast({
-        title: "Booking Failed",
-        description: "There was an error booking your appointment. Please try again.",
-        variant: "destructive",
-      });
-      console.error('Error booking appointment:', error);
+
+      // refresh user's appointments
+      try {
+        const r = await api.get('/appointments/mine');
+        setMyAppointments(r.data);
+      } catch (err) {
+        // ignore
+      }
+    } catch (error:any) {
+      if (error?.response?.status === 409) {
+        toast({ title: 'Time slot taken', description: error.response.data?.message || 'Please choose another time.', variant: 'destructive' });
+      } else {
+        toast({
+          title: "Booking Failed",
+          description: "There was an error booking your appointment. Please try again.",
+          variant: "destructive",
+        });
+        console.error('Error booking appointment:', error);
+      }
     }
   };
   
   
+
+  const [myAppointments, setMyAppointments] = useState<any[]>([]);
 
   useEffect(() => {
     api
@@ -93,11 +107,21 @@ export default function Appointments() {
       .then((response) => {
         console.log("Fetched user:", response.data.user);
         setUser(response.data.user);
-
       })
       .catch((error) => {
         console.error("Error fetching user:", error);
       });
+
+    // Fetch user's own appointments
+    const fetchMy = async () => {
+      try {
+        const r = await api.get('/appointments/mine');
+        setMyAppointments(r.data);
+      } catch (err) {
+        // ignore silently
+      }
+    };
+    fetchMy();
   }, []);
 
   return (
@@ -239,6 +263,29 @@ export default function Appointments() {
             <Calendar className="w-4 h-4 mr-2" />
             Book Appointment
           </Button>
+
+          {/* Your appointment requests */}
+          <div className="mt-6">
+            <Card className="wellness-card p-6">
+              <h3 className="text-lg font-semibold mb-3">Your Appointments</h3>
+              {myAppointments.length === 0 ? (
+                <div className="text-sm text-muted-foreground">You have no appointment requests.</div>
+              ) : (
+                <div className="space-y-3">
+                  {myAppointments.map((a:any) => (
+                    <div key={a._id} className="p-3 rounded-lg border border-border flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{a.fullName}</div>
+                        <div className="text-sm text-muted-foreground">{a.discussion || a.type}</div>
+                        <div className="text-xs text-muted-foreground">{a.date} — {a.time} • <span className="font-medium">{a.status}</span></div>
+                        {a.responseNote && <div className="text-xs text-muted-foreground">Note: {a.responseNote}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
 
         {/* Sidebar Info */}

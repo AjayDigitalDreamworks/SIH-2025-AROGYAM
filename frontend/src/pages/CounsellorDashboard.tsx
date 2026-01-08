@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { WellnessCard } from "@/components/WellnessCard";
 import { UpcomingAppointments } from "@/components/UpcomingAppointments";
 import { LatestResources } from "@/components/LatestResources";
+import CounsellorRequests from "@/components/CounsellorRequests";
 import api from "@/config/api";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -95,13 +96,9 @@ export default function CounsellorDashboard() {
       <main className="container mx-auto px-6 py-8 max-w-7xl">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <HeroSection userName={user?.username || "Counsellor"} title="Counsellor Dashboard" />
+            <HeroSection userName={user?.username || "Counsellor"}  />
           </div>
-          <div className="ml-4 mt-4">
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600">
-              Logout
-            </Button>
-          </div>
+          
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -119,8 +116,14 @@ export default function CounsellorDashboard() {
           ))}
         </div>
 
-        <div className="mb-8">
-          <UpcomingAppointments />
+        <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <UpcomingAppointments />
+          </div>
+          <div>
+            {/* Counsellor-specific requests panel */}
+            <CounsellorRequests />
+          </div>
         </div>
 
         <div className="mb-8">
