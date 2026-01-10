@@ -128,6 +128,12 @@ const UserSchema = new mongoose.Schema({
     enum: ['Freshman','Sophomore','Junior','Senior','1st year', '2nd year', '3rd year', '4th year', 'Graduate','Other'],
   },
 
+  role: {
+    type: String,
+    enum: ["student", "volunteer"],
+    default: "student",
+  },
+
     moodHistory: [
     {
       date: { type: Date, default: Date.now },

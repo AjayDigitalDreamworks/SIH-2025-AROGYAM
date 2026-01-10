@@ -89,7 +89,9 @@ app.use('/hub', videoRoutes);
 app.use('/users', userRoutes);
 
 // Counsellor auth routes
+const volunteerRoute = require("./routes/volunteer");
 app.use('/api/counsellor', counsellorAuth);
+app.use('/api/volunteer', volunteerRoute);
 
 
 
