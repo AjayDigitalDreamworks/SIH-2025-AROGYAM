@@ -23,7 +23,7 @@ import Games from "./pages/Games";
 import LandingResources from "./pages/LandingResources";
 import LandingSupport from "./pages/LandingSupport";
 import LandingBooking from "./pages/LandingBooking";
-import Signup from "./pages/Signup";
+import SignUpForm from "./pages/Signup";
 import Login from "./pages/Login";
 
 
@@ -67,7 +67,7 @@ const App = () => (
             
             {/* Routes without Sidebar/Header (Login & Signup) */}
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<SignUpForm />} />
             
             {/* Counsellor auth (signup/login) */}
             <Route path="/counsellor/signup" element={<CounsellorSignup />} />
