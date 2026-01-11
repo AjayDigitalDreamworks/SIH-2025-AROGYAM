@@ -17,7 +17,7 @@ import Sleep from "./pages/Sleep";
 import Exercise from "./pages/Exercise";
 import Crisis from "./pages/Crisis";
 
-import NotFound from "./pages/NotFound";
+// import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Games from "./pages/Games";
 import LandingResources from "./pages/LandingResources";
@@ -105,7 +105,7 @@ const App = () => (
             <Route path="/admin/signup" element={<AdminSignup />} />
 
             {/* Catch-all for unmatched routes */}
-            <Route path="*" element={<NotFound />} />
+            {/* <Route path="*" element={<NotFound />} /> */}
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
