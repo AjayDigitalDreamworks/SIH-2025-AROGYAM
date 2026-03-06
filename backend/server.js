@@ -13,7 +13,8 @@ const authRoutes = require("./routes/authRoutes");
 const { verifyToken } = require("./middleware/authMiddleware");
 const userRoutes = require('./routes/userRoutes');
 const counsellorAuth = require('./routes/counsellorAuth');
-
+const cron = require('node-cron');
+const nodemailer = require('nodemailer'); 
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -46,6 +47,11 @@ mongoose
   .then(() => console.log("MongoDB connected..."))
   .catch((err) => console.log(err));
 
+
+
+
+
+
 // Authentication Routes (login/signup)
 app.use("/api/auth", authRoutes);
 
@@ -72,6 +78,82 @@ app.get('/current_user', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Error fetching user', error: err.message });
   }
 });
+
+
+
+
+
+
+//notification routes
+// Run every 5 minutes to check for upcoming appointments within the next 2 hours
+cron.schedule('*/5 * * * *', async () => {
+  try {
+    const now = new Date();
+    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+     console.log("hello from cron job", now.toISOString(), twoHoursLater.toISOString());
+    const appointments = await Appointment.find({
+      date: { 
+        $gte: now.toISOString().split('T')[0], 
+        $lte: twoHoursLater.toISOString().split('T')[0] 
+      },
+      status: { $in: ['pending', 'accepted', 'modified'] },
+      reminderSent: { $ne: true }
+    }).populate('userId').populate('counselorId');
+
+    for (const appt of appointments) {
+
+      let apptDateTime;
+
+      if (appt.time && appt.time.length <= 5) {
+        apptDateTime = new Date(`${appt.date}T${appt.time}:00`);
+      } else {
+        apptDateTime = new Date(`${appt.date}T${appt.time}`);
+      }
+
+      const diff = apptDateTime - now;
+
+      // Send reminder if appointment is within the next 2 hours
+      if (diff > 0 && diff <= 2 * 60 * 60 * 1000) {
+
+        const userEmail = appt.userId?.email;
+
+        if (!userEmail || !userEmail.includes('@')) {
+          console.error(`No valid email found for userId: ${appt.userId?._id}`);
+          continue;
+        }
+
+        const message = `Reminder: You have an appointment with ${appt.counselorId?.name || 'your counselor'} at ${appt.time} on ${appt.date}.`;
+
+        try {
+          await transporter.sendMail({
+            from: "arogyam.help01@gmail.com",
+            to: userEmail,
+            subject: "Appointment Reminder",
+            text: message
+          });
+
+          appt.reminderSent = true;
+          await appt.save();
+
+          console.log(`Reminder sent to ${userEmail}`);
+        } catch (emailErr) {
+          console.error(`Failed to send reminder to ${userEmail}:`, emailErr);
+        }
+      }
+    }
+
+  } catch (err) {
+    console.error('Error sending reminders:', err);
+  }
+});
+
+
+
+
+
+
+
+
 
 
 

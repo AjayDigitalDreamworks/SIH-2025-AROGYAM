@@ -14,7 +14,9 @@ const AppointmentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, refPath: 'updatedByModel' },
   updatedByModel: { type: String, enum: ['User','Counselor'] },
-  responseNote: { type: String }
+  responseNote: { type: String },
+   reminderSent: { type: Boolean, default: false },
+  followUpSent: { type: Boolean, default: false }
 }, { timestamps: true });
 
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
