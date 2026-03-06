@@ -32,7 +32,7 @@ export function Layout({ children }: LayoutProps) {
     const token = localStorage.getItem("token");
     
     const decoded = jwtDecode(token);
-    console.log("Token for notifications:", decoded);
+    // console.log("Token for notifications:", decoded);
     const userId = decoded.userId;
 
     localStorage.setItem("userName", decoded.fullname);
