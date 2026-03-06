@@ -101,31 +101,68 @@ app.get('/current_user', verifyToken, async (req, res) => {
 //   }
 // });
 
+
+
+function formatTime12Hour(date) {
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${hours}:${minutes} ${ampm}`;
+}
+
 async function sendAppointmentReminders() {
+  console.log("Running appointment reminder job at", new Date().toISOString());
+
   const now = new Date();
   const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
+  const today = now.toISOString().split("T")[0];
+
+  const nowTime = formatTime12Hour(now);
+  const twoHoursLaterTime = formatTime12Hour(twoHoursLater);
+
+  console.log("Checking appointments between:", nowTime, "and", twoHoursLaterTime);
+
   try {
     const appointments = await Appointment.find({
-      date: { $eq: now.toISOString().split('T')[0] }, // Today's date
-      time: { $gte: now.toTimeString().slice(0,5), $lte: twoHoursLater.toTimeString().slice(0,5) }, // Time within next 2 hours
-      status: 'accepted',
+      date: today,
+      time: { $gte: nowTime, $lte: twoHoursLaterTime },
+      status: "accepted",
       reminderSent: false
-    }).populate('counselorId').populate('userId').exec();
+    })
+      .populate("counselorId")
+      .populate("userId")
+      .exec();
+
     console.log("Appointments needing reminders:", appointments);
+
     for (const appt of appointments) {
       const userEmail = appt.email;
-      const counselorName = appt.counselorId ? appt.counselorId.name : 'your counselor';
+
+      const counselorName = appt.counselorId
+        ? appt.counselorId.name
+        : "your counselor";
+
       const apptTime = `${appt.date} at ${appt.time}`;
+
       const mailOptions = {
         from: "arogyam.help01@gmail.com",
         to: userEmail,
         subject: "Upcoming Appointment Reminder",
         text: `This is a reminder for your upcoming appointment with ${counselorName} scheduled on ${apptTime}. Please be prepared and join on time.`
       };
+
       try {
         await transporter.sendMail(mailOptions);
+
         console.log("Reminder email sent to:", userEmail);
+
         appt.reminderSent = true;
         await appt.save();
       } catch (emailErr) {
@@ -136,6 +173,8 @@ async function sendAppointmentReminders() {
     console.error("Error fetching appointments for reminders:", err);
   }
 }
+
+
 
 // Schedule the reminder function to run every 10 minutes
 cron.schedule("*/10 * * * * *", sendAppointmentReminders);
@@ -185,25 +224,32 @@ app.use('/api/community', communityRoute);
 
 // Create appointment (student request). Prevent double bookings for same counsellor/date/time
 app.post("/appointments", verifyToken, async (req, res) => {
+
+  
   try {
     const { counselorId, date, time, type, fullName, email, phone, discussion, userId } = req.body;
+    // console.log("Received appointment booking request:", req.body);
     // Validate required fields
     if (!counselorId || !date || !time || !type || !fullName || !email || !phone) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
+    // console.log("Received appointment booking request upper :", req.body);
+
     // Validate date and time format (basic check)
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
-    if (!dateRegex.test(date)) {
-      return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD.' });
-    }
-    if (!timeRegex.test(time)) {
-      return res.status(400).json({ message: 'Invalid time format. Use HH:mm or HH:mm:ss.' });
-    }
+    // const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    // const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
+    // if (!dateRegex.test(date)) {
+    //   return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD.' });
+    // }
+    // if (!timeRegex.test(time)) {
+    //   return res.status(400).json({ message: 'Invalid time format. Use HH:mm or HH:mm:ss.' });
+    // }
 
     // Check for existing appointment with same counselor/date/time in pending/accepted/modified state
     const conflict = await Appointment.findOne({ counselorId, date, time, status: { $in: ['pending','accepted','modified'] } });
+    // console.log("Conflict check result:", conflict);
+    // console.log("Received appointment booking request down :", req.body);
     if (conflict) {
       return res.status(409).json({ message: 'Selected time slot is already taken. Please choose another time.' });
     }
@@ -221,6 +267,8 @@ app.post("/appointments", verifyToken, async (req, res) => {
       userId
     });
     await appointment.save();
+
+    // console.log("Received appointment booking request low :", req.body);
 
     // If userId is provided, push appointment to user's appointments array
     if (userId) {

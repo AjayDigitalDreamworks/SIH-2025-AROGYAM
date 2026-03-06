@@ -64,6 +64,7 @@ export default function Appointments() {
     // console.log('Booking appointment with payload:', appointmentPayload);
     try {
       const response = await api.post(`/appointments`, appointmentPayload);
+      console.log('Received response:', response.data);
       console.log('Appointment booked successfully:', response.data);
       toast({
         title: "Appointment Booked!",
