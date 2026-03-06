@@ -86,7 +86,7 @@ app.get('/current_user', verifyToken, async (req, res) => {
 
 //notification routes
 // Run every 5 minutes to check for upcoming appointments within the next 2 hours
-cron.schedule('*/5 * * * *', async () => {
+cron.schedule('*/1 * * * *', async () => {
   try {
     const now = new Date();
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
@@ -99,19 +99,19 @@ cron.schedule('*/5 * * * *', async () => {
       status: { $in: ['pending', 'accepted', 'modified'] },
       reminderSent: { $ne: true }
     }).populate('userId').populate('counselorId');
-
+       console.log(`Found ${appointments.length} upcoming appointments needing reminders.`);
     for (const appt of appointments) {
 
-      let apptDateTime;
+      let apptDateTime; 
 
       if (appt.time && appt.time.length <= 5) {
         apptDateTime = new Date(`${appt.date}T${appt.time}:00`);
       } else {
         apptDateTime = new Date(`${appt.date}T${appt.time}`);
       }
-
+                 
       const diff = apptDateTime - now;
-
+       console.log(`Checking appointment ${diff}`);
       // Send reminder if appointment is within the next 2 hours
       if (diff > 0 && diff <= 2 * 60 * 60 * 1000) {
 
@@ -121,13 +121,20 @@ cron.schedule('*/5 * * * *', async () => {
           console.error(`No valid email found for userId: ${appt.userId?._id}`);
           continue;
         }
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          }
+        });
 
         const message = `Reminder: You have an appointment with ${appt.counselorId?.name || 'your counselor'} at ${appt.time} on ${appt.date}.`;
-
+             console.log(message);
         try {
           await transporter.sendMail({
             from: "arogyam.help01@gmail.com",
-            to: userEmail,
+            to: "anshulmangla143@gmail.com",
             subject: "Appointment Reminder",
             text: message
           });
@@ -135,7 +142,7 @@ cron.schedule('*/5 * * * *', async () => {
           appt.reminderSent = true;
           await appt.save();
 
-          console.log(`Reminder sent to ${userEmail}`);
+          console.log(`Reminder sent to anshulmangla143@gmail.com}`);
         } catch (emailErr) {
           console.error(`Failed to send reminder to ${userEmail}:`, emailErr);
         }
