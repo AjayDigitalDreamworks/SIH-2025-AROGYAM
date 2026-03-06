@@ -19,6 +19,36 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Notification popup state
+  const [showNotifications, setShowNotifications] = React.useState(false);
+
+  // Stateful notifications
+  const [notifications, setNotifications] = React.useState([
+    { id: 1, message: "Your appointment is confirmed for tomorrow." },
+    { id: 2, message: "New wellness guide available!" },
+    { id: 3, message: "Community event this Friday." },
+  ]);
+
+  // Dismiss individual notification
+  const handleDismissNotification = (id: number) => {
+    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  };
+
+  const handleBellClick = () => setShowNotifications(true);
+  const handleDismiss = () => setShowNotifications(false);
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch (e) {
+      // ignore server errors
+    } finally {
+      localStorage.removeItem('token');
+      toast({ title: 'Logged out', description: 'You have been logged out.' });
+      navigate('/login');
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -52,10 +82,48 @@ export function Layout({ children }: LayoutProps) {
               <div className="flex items-center gap-4">
                 <ThemeToggle />
 
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
-                </Button>
+                {/* Notification Bell and Popup */}
+                <div className="relative">
+                  <Button variant="ghost" size="icon" className="relative" onClick={handleBellClick} aria-label="Show notifications">
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+                  </Button>
+                  {showNotifications && (
+                    <div
+                      className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg"
+                      style={{ zIndex: 9999, overflow: 'visible' }}
+                    >
+                      <div className="flex items-center justify-between px-4 py-2 border-b">
+                        <span className="font-semibold text-lg">Notifications</span>
+                        <button
+                          className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                          onClick={handleDismiss}
+                          aria-label="Dismiss notifications"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <ul className="max-h-60 overflow-y-auto" style={{ overflowY: 'auto' }}>
+                        {notifications.length === 0 ? (
+                          <li className="px-4 py-3 text-gray-500">No notifications</li>
+                        ) : (
+                          notifications.map((notif) => (
+                            <li key={notif.id} className="px-4 py-3 border-b last:border-b-0 text-gray-700 flex justify-between items-center">
+                              <span>{notif.message}</span>
+                              <button
+                                className="ml-2 text-gray-400 hover:text-red-500 text-lg font-bold"
+                                onClick={() => handleDismissNotification(notif.id)}
+                                aria-label="Dismiss notification"
+                              >
+                                ×
+                              </button>
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
@@ -64,7 +132,6 @@ export function Layout({ children }: LayoutProps) {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {localStorage.getItem('userEmail') || 'User'}
-                     
                     </p>
                   </div>
                   <Avatar>
@@ -80,17 +147,7 @@ export function Layout({ children }: LayoutProps) {
                     variant="ghost"
                     size="sm"
                     className="text-red-600"
-                    onClick={async () => {
-                      try {
-                        await api.post('/api/auth/logout');
-                      } catch (e) {
-                        // ignore server errors
-                      } finally {
-                        localStorage.removeItem('token');
-                        toast({ title: 'Logged out', description: 'You have been logged out.' });
-                        navigate('/login');
-                      }
-                    }}
+                    onClick={handleLogout}
                   >
                     Logout
                   </Button>
