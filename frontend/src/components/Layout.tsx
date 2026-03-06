@@ -10,6 +10,7 @@ import api from "@/config/api";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { jwtDecode } from "jwt-decode";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,11 +24,34 @@ export function Layout({ children }: LayoutProps) {
   const [showNotifications, setShowNotifications] = React.useState(false);
 
   // Stateful notifications
-  const [notifications, setNotifications] = React.useState([
-    { id: 1, message: "Your appointment is confirmed for tomorrow." },
-    { id: 2, message: "New wellness guide available!" },
-    { id: 3, message: "Community event this Friday." },
-  ]);
+  const [notifications, setNotifications] = React.useState([]);
+
+
+  const fetchNotifications = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    
+    const decoded = jwtDecode(token);
+    console.log("Token for notifications:", decoded);
+    const userId = decoded.userId;
+
+    localStorage.setItem("userName", decoded.fullname);
+    localStorage.setItem("userEmail", decoded.email); 
+
+     
+
+    const res = await api.get(`http://localhost:3000/notifications/${userId}`);
+
+    setNotifications(res.data);
+
+  } catch (err) {
+    console.error("Error fetching notifications", err);
+  }
+};
+
+React.useEffect(() => {
+  fetchNotifications();
+}, []);
 
   // Dismiss individual notification
   const handleDismissNotification = (id: number) => {
@@ -44,6 +68,7 @@ export function Layout({ children }: LayoutProps) {
       // ignore server errors
     } finally {
       localStorage.removeItem('token');
+      localStorage.clear();
       toast({ title: 'Logged out', description: 'You have been logged out.' });
       navigate('/login');
     }

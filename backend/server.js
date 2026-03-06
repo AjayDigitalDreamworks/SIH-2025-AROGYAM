@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const videoRoutes = require("./routes/videoRoutes");
+const Notification = require("./models/Notification");
 const path = require("path");
 const User = require("./models/user");
 const Appointment = require("./models/appointment");
@@ -181,17 +182,52 @@ cron.schedule("*/10 * * * * *", sendAppointmentReminders);
     
 
 
+// mood check routes
+async function checkMoodStreak() {
 
+  const users = await User.find();
 
+  const today = new Date().toISOString().split("T")[0];
 
+  console.log("Running mood streak check for users:", users.map(u => u.email));
 
+  for (const user of users) {
 
+    // check inside moodHistory array
+    const todayEntry = user.moodHistory.find(
+      entry => {
+        const entryDate = new Date(entry.date).toISOString().split("T")[0];
+        return entryDate === today;
+      }
+    );
 
+    if (!todayEntry) {
 
+      await Notification.create({
+        userId: user._id,
+        title: "Streak Alert",
+        message: "Update your mood today to maintain your streak!",
+        type: "streak"
+      });
 
+      console.log(`Notification created for ${user.email}`);
 
+    }
+  }
+}
 
+cron.schedule("4 20 * * *", checkMoodStreak);
 
+// get notifications
+app.get("/notifications/:userId", async (req, res) => {
+
+  const notifications = await Notification
+    .find({ userId: req.params.userId })
+    .sort({ createdAt: -1 });
+
+  res.json(notifications);
+
+});
 
 
 
