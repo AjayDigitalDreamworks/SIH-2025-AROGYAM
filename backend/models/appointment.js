@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 const AppointmentSchema = new mongoose.Schema({
   counselorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Counselor', required: true },
+  // Date stored as string in format 'YYYY-MM-DD'
   date: { type: String, required: true },
+  // Time stored as string in format 'HH:mm' or 'HH:mm:ss'
   time: { type: String, required: true },
   type: { type: String, required: true },
   fullName: { type: String, required: true },
@@ -15,7 +17,7 @@ const AppointmentSchema = new mongoose.Schema({
   updatedBy: { type: mongoose.Schema.Types.ObjectId, refPath: 'updatedByModel' },
   updatedByModel: { type: String, enum: ['User','Counselor'] },
   responseNote: { type: String },
-   reminderSent: { type: Boolean, default: false },
+  reminderSent: { type: Boolean, default: false },
   followUpSent: { type: Boolean, default: false }
 }, { timestamps: true });
 

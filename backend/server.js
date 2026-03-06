@@ -86,80 +86,64 @@ app.get('/current_user', verifyToken, async (req, res) => {
 
 
 //notification routes
-// Run every 5 minutes to check for upcoming appointments within the next 2 hours
-cron.schedule('*/5 * * * *', async () => {
+
+
+// const info = transporter.sendMail({
+//   from: "arogyam.help01@gmail.com",
+//   to: "autenic123@gmail.com",
+//   subject: "Test Email from Arogyam",
+//   text: "This is a test email to verify nodemailer setup."
+// }, (err, info) => {
+//   if (err) {
+//     console.error("Test email failed:", err);
+//   } else {
+//     console.log("Test email sent:", info.response);
+//   }
+// });
+
+async function sendAppointmentReminders() {
+  const now = new Date();
+  const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
   try {
-    const now = new Date();
-    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-
-    console.log("Cron Running:", now);
-
     const appointments = await Appointment.find({
-      status: { $in: ["pending", "accepted", "modified"] },
-      reminderSent: { $ne: true }
-    }).populate('userId').populate('counselorId');
-
+      date: { $eq: now.toISOString().split('T')[0] }, // Today's date
+      time: { $gte: now.toTimeString().slice(0,5), $lte: twoHoursLater.toTimeString().slice(0,5) }, // Time within next 2 hours
+      status: 'accepted',
+      reminderSent: false
+    }).populate('counselorId').populate('userId').exec();
+    console.log("Appointments needing reminders:", appointments);
     for (const appt of appointments) {
-
-      let apptDateTime; 
-
-      if (appt.time && appt.time.length <= 5) {
-        apptDateTime = new Date(`${appt.date}T${appt.time}:00`);
-      } else {
-        apptDateTime = new Date(`${appt.date}T${appt.time}`);
-      }
-                 
-      const diff = apptDateTime - now;
-
-      // Send reminder if appointment is within the next 2 hours
-      if (diff > 0 && diff <= 2 * 60 * 60 * 1000) {
-
-        const userEmail = appt.userId?.email;
-
-        if (!userEmail || !userEmail.includes("@")) {
-          console.log("Invalid Email for user:", appt.userId?._id);
-          continue;
-        }
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
-        });
-
-        const message = `Reminder: You have an appointment with ${appt.counselorId?.name || 'your counselor'} at ${appt.time} on ${appt.date}.`;
-
-        try {
-
-          await transporter.sendMail({
-            from: "arogyam.help01@gmail.com",
-            to: userEmail,
-            subject: "Appointment Reminder",
-            text: message
-          });
-
-          console.log("Reminder sent to:", userEmail);
-
-          appt.reminderSent = true;
-          await appt.save();
-
-          console.log(`Reminder sent to ${userEmail}`);
-        } catch (emailErr) {
-
-          console.error("Email send failed:", emailErr);
-
-        }
+      const userEmail = appt.email;
+      const counselorName = appt.counselorId ? appt.counselorId.name : 'your counselor';
+      const apptTime = `${appt.date} at ${appt.time}`;
+      const mailOptions = {
+        from: "arogyam.help01@gmail.com",
+        to: userEmail,
+        subject: "Upcoming Appointment Reminder",
+        text: `This is a reminder for your upcoming appointment with ${counselorName} scheduled on ${apptTime}. Please be prepared and join on time.`
+      };
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log("Reminder email sent to:", userEmail);
+        appt.reminderSent = true;
+        await appt.save();
+      } catch (emailErr) {
+        console.error("Error sending reminder email:", emailErr);
       }
     }
-
   } catch (err) {
-
-    console.error("Cron Error:", err);
-
+    console.error("Error fetching appointments for reminders:", err);
   }
+}
 
-});
+// Schedule the reminder function to run every 10 minutes
+cron.schedule("*/10 * * * * *", sendAppointmentReminders);
+    
+
+
+
+
 
 
 
@@ -202,16 +186,40 @@ app.use('/api/community', communityRoute);
 // Create appointment (student request). Prevent double bookings for same counsellor/date/time
 app.post("/appointments", verifyToken, async (req, res) => {
   try {
-    const { counselorId, date, time, userId } = req.body;
-    if (!counselorId || !date || !time) return res.status(400).json({ message: 'Missing fields' });
+    const { counselorId, date, time, type, fullName, email, phone, discussion, userId } = req.body;
+    // Validate required fields
+    if (!counselorId || !date || !time || !type || !fullName || !email || !phone) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-    // Check for existing appointment with same counselor/date/time in pending or accepted state
+    // Validate date and time format (basic check)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
+    if (!dateRegex.test(date)) {
+      return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD.' });
+    }
+    if (!timeRegex.test(time)) {
+      return res.status(400).json({ message: 'Invalid time format. Use HH:mm or HH:mm:ss.' });
+    }
+
+    // Check for existing appointment with same counselor/date/time in pending/accepted/modified state
     const conflict = await Appointment.findOne({ counselorId, date, time, status: { $in: ['pending','accepted','modified'] } });
     if (conflict) {
       return res.status(409).json({ message: 'Selected time slot is already taken. Please choose another time.' });
     }
 
-    const appointment = new Appointment(req.body);
+    // Create appointment with relevant fields
+    const appointment = new Appointment({
+      counselorId,
+      date,
+      time,
+      type,
+      fullName,
+      email,
+      phone,
+      discussion,
+      userId
+    });
     await appointment.save();
 
     // If userId is provided, push appointment to user's appointments array
@@ -364,4 +372,4 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);
-});
+}); 
