@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import MentalHealthChatbotUI from "./chatboat/chatSent";
+import ChatInvent from "./chatboat/Invent";
+import HybridChat from "./chatboat/Hybrid";
 import Appointments from "./pages/Appointments";
 import Resources from "./pages/Resources";
 import Community from "./pages/Community";
@@ -26,6 +28,7 @@ import LandingSupport from "./pages/LandingSupport";
 import LandingBooking from "./pages/LandingBooking";
 import SignUpForm from "./pages/Signup";
 import Login from "./pages/Login";
+
 
 
 // Counsellor pages
@@ -67,6 +70,8 @@ const App = () => (
             <Route path="/landing-support" element={<LandingSupport />} />
             <Route path="/landing-booking" element={<LandingBooking />} />
             <Route path="/chatbot" element={<MentalHealthChatbotUI />} />
+            <Route path="/chat" element={<ChatInvent/>} />
+            <Route path="/hybridchat" element={<HybridChat />} />
             
             {/* Routes without Sidebar/Header (Login & Signup) */}
             <Route path="/login" element={<Login />} />

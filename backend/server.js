@@ -12,6 +12,8 @@ const User = require("./models/user");
 const Appointment = require("./models/appointment");
 const authRoutes = require("./routes/authRoutes"); 
 const { verifyToken } = require("./middleware/authMiddleware");
+const interventionRoutes = require("./routes/interventionRoutes");
+const hybridRoutes = require("./routes/hybridRoutes");
 const userRoutes = require('./routes/userRoutes');
 const counsellorAuth = require('./routes/counsellorAuth');
 const cron = require('node-cron');
@@ -65,6 +67,12 @@ app.use("/api/chat", require("./routes/chat"));
 app.get("/protected", verifyToken, (req, res) => {
   res.json({ message: "You have access to this protected route", user: req.user });
 });
+
+// ai intervention
+app.use("/api/intervention", interventionRoutes);
+
+// hybrid
+app.use("/api/hybrid", hybridRoutes);
 
 // Example of another protected route (fetch user data)
 
