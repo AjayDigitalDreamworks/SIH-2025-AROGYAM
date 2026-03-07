@@ -2,70 +2,109 @@ import React, { useState, useEffect } from "react";
 import { Heart, Moon, GraduationCap, Flame } from "lucide-react";
 import { HeroSection } from "@/components/HeroSection";
 import { WellnessCard } from "@/components/WellnessCard";
-import { QuickActions } from "@/components/QuickActions";
+import QuickActions from "@/components/QuickActions";
 import { CommunityHighlights } from "@/components/CommunityHighlights";
 import { WellnessJourney } from "@/components/WellnessJourney";
 import { WellnessTip } from "@/components/WellnessTip";
 import { EmergencySupport } from "@/components/EmergencySupport";
 import { UpcomingAppointments } from "@/components/UpcomingAppointments";
 import { LatestResources } from "@/components/LatestResources";
+import { Button } from "@/components/ui/button";
 import api from "@/config/api";
 
-const cloudinaryBase = "https://res.cloudinary.com/dlpyvzfis/video/upload/";
-
 export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [wellnessData, setWellnessData] = useState<any[]>([]);
-  const [appointmentsData, setAppointmentsData] = useState<any[]>([]);
+
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [wellnessData, setWellnessData] = useState([]);
+  const [appointmentsData, setAppointmentsData] = useState([]);
   const [resourcesData, setResourcesData] = useState({
     videos: [],
     guides: [],
-    exercises: [],
+    exercises: []
   });
-  const [communitiesData, setCommunitiesData] = useState<any[]>([]);
+  const [communitiesData, setCommunitiesData] = useState([]);
 
   useEffect(() => {
+
     const token = localStorage.getItem("token");
+
     if (!token) {
-      setError("No token found, please log in again.");
+      setError("Please login again");
       window.location.href = "/login";
       return;
     }
 
-    // Fetch dashboard + resources + communities in parallel
-    const fetchDashboard = async () => {
+    const fetchAllData = async () => {
+
       try {
-        // Dashboard data
-        const res = await api.get("/users/dashboard");
-        const { user, latestMood, latestSleep, upcomingAppointments, quizScores } = res.data;
-        setUser(user);
-        setAppointmentsData(upcomingAppointments || []);
 
-        // Wellness cards
-        const moodProgress = latestMood ? Math.round((latestMood.mood / 5) * 100) : 0;
-        const sleepProgress = latestSleep ? Math.round(Math.min(100, (latestSleep.hours / 8) * 100)) : 0;
+        const [dashboardRes, resourcesRes, communityRes] = await Promise.all([
+          api.get("/users/dashboard"),
+          api.get("/hub"),
+          api.get("/api/community")
+        ]);
+
+        const dashboard = dashboardRes.data;
+        const userData = dashboard.user;
+
+        setUser(userData);
+        setAppointmentsData(dashboard.upcomingAppointments || []);
+
+        setResourcesData({
+          videos: resourcesRes.data.videos || [],
+          guides: resourcesRes.data.guides || [],
+          exercises: resourcesRes.data.exercises || []
+        });
+
+        setCommunitiesData(communityRes.data?.communities || []);
+
+        /* ---------------- WELLNESS CARDS ---------------- */
+
+        const latestMood = dashboard.latestMood;
+        const latestSleep = dashboard.latestSleep;
+        const quizScores = dashboard.quizScores;
+
+        const moodProgress = latestMood
+          ? Math.round((latestMood.mood / 5) * 100)
+          : 0;
+
+        const sleepProgress = latestSleep
+          ? Math.round(Math.min(100, (latestSleep.hours / 8) * 100))
+          : 0;
+
         const studyStress =
-          quizScores && quizScores.length ? Math.round(Math.min(100, quizScores[0].score || 50)) : 50;
+          quizScores && quizScores.length
+            ? Math.round(Math.min(100, quizScores[0].score || 50))
+            : 50;
 
-        const streak = (() => {
-          if (!user?.moodHistory?.length) return 0;
-          const sorted = [...user.moodHistory].sort(
-            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        /* ---------------- STREAK CALCULATION ---------------- */
+
+        let streak = 0;
+
+        if (userData?.moodHistory?.length) {
+
+          const sorted = [...userData.moodHistory].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
           );
-          let curr = new Date();
-          let streakCount = 0;
-          for (const entry of sorted) {
-            const entryDate = new Date(entry.date);
-            const diffDays = Math.floor(
-              (curr.setHours(0, 0, 0, 0) - new Date(entryDate).setHours(0, 0, 0, 0)) /
-                (1000 * 60 * 60 * 24)
-            );
-            if (diffDays === streakCount && entry.mood >= 3) streakCount += 1;
-            else if (diffDays > streakCount) break;
+
+          const today = new Date();
+          today.setHours(0,0,0,0);
+
+          for (let i = 0; i < sorted.length; i++) {
+            const entryDate = new Date(sorted[i].date);
+            entryDate.setHours(0,0,0,0);
+            const diffDays =
+              (today.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24);
+            if (diffDays === i && sorted[i].mood >= 3) {
+              streak++;
+            } else {
+              break;
+            }
           }
-          return streakCount;
-        })();
+        }
 
         setWellnessData([
           {
@@ -75,7 +114,7 @@ export default function Dashboard() {
             iconBgColor: "bg-wellness-green",
             progress: moodProgress,
             progressColor: "green",
-            emoji: "💚",
+            emoji: "💚"
           },
           {
             title: "Sleep Quality",
@@ -84,7 +123,7 @@ export default function Dashboard() {
             iconBgColor: "bg-wellness-blue",
             progress: sleepProgress,
             progressColor: "blue",
-            emoji: "🌙",
+            emoji: "🌙"
           },
           {
             title: "Study Stress",
@@ -93,7 +132,7 @@ export default function Dashboard() {
             iconBgColor: "bg-wellness-orange",
             progress: studyStress,
             progressColor: "orange",
-            emoji: "🎓",
+            emoji: "🎓"
           },
           {
             title: "Streak",
@@ -102,58 +141,158 @@ export default function Dashboard() {
             iconBgColor: "bg-wellness-yellow",
             progress: Math.min(100, streak),
             progressColor: "yellow",
-            emoji: "🔥",
-          },
+            emoji: "🔥"
+          }
         ]);
-      } catch (err: any) {
-        console.error("Error fetching dashboard data:", err);
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+
+        setLoading(false);
+
+      } catch (err) {
+
+        console.error(err);
+
+        setError("Failed to load dashboard");
+
+        if (err.response?.status === 401) {
           localStorage.removeItem("token");
           window.location.href = "/login";
-        } else {
-          setError("Failed to load dashboard");
         }
+
+        setLoading(false);
       }
     };
 
-    const fetchResources = async () => {
-      try {
-        const res = await api.get("/hub");
-        const data = res.data;
-        console.log("Fetched hub resources:", data);
-        setResourcesData({
-          videos: data.videos || [],
-          guides: data.guides || [],
-          exercises: data.exercises || [],
-        });
-      } catch (err) {
-        console.error("Error fetching resources:", err);
-      }
-    };
+    fetchAllData();
 
-    const fetchCommunities = async () => {
-      try {
-        const res = await api.get("/api/community");
-        setCommunitiesData(res.data?.communities || []);
-      } catch (err) {
-        console.error("Error fetching communities:", err);
-      }
-    };
-
-    fetchDashboard();
-    fetchResources();
-    fetchCommunities();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="p-10 text-center text-lg">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-10 text-red-500 text-center">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
+
       <main className="container mx-auto px-6 py-8 max-w-7xl">
-        {/* Hero Section */}
+
         <HeroSection userName={user?.username || "User"} />
 
-        {/* Wellness Cards */}
+        {/* WELLBEING + MOOD TRACKER */}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+          {/* WELLBEING OVERVIEW */}
+
+          <div className="rounded-xl bg-white shadow p-6 flex flex-col items-center">
+
+            <h2 className="text-xl font-semibold mb-4">
+              Your Wellbeing Overview
+            </h2>
+
+            <div className="flex items-center gap-6">
+
+              <div className="relative">
+
+                <svg width="100" height="100">
+
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                  />
+
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="#7c3aed"
+                    strokeWidth="8"
+                    strokeDasharray="282"
+                    strokeDashoffset={
+                      282 -
+                      Math.round(
+                        (user?.wellbeingScore ?? 78) / 100 * 282
+                      )
+                    }
+                  />
+
+                </svg>
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+
+                  <span className="text-3xl font-bold">
+                    {user?.wellbeingScore ?? 78}
+                  </span>
+
+                  <span className="text-xs text-muted-foreground">
+                    /100
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* MOOD TRACKER */}
+
+          <div className="rounded-xl bg-white shadow p-6 flex flex-col items-center">
+
+            <h2 className="text-xl font-semibold mb-4">
+              Mood Tracker
+            </h2>
+
+            <div className="flex gap-2 mb-4">
+
+              {(user?.moodHistory ?? [])
+                .slice(-7)
+                .map((entry, idx) => (
+
+                  <span key={idx} className="text-2xl">
+
+                    {["😢","😞","😐","😊","😍"][entry.mood - 1]}
+
+                  </span>
+
+                ))}
+
+            </div>
+
+            <Button
+              className="w-full"
+              onClick={() => window.location.href = "/mood"}
+            >
+              Log Mood
+            </Button>
+
+          </div>
+
+        </div>
+
+        {/* WELLNESS CARDS */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
           {wellnessData.map((data) => (
+
             <WellnessCard
               key={data.title}
               title={data.title}
@@ -164,46 +303,33 @@ export default function Dashboard() {
               progressColor={data.progressColor}
               emoji={data.emoji}
             />
+
           ))}
-        </div>
-
-        {/* Upcoming Appointments */}
-        <div className="mb-8">
-          <UpcomingAppointments appointments={appointmentsData} />
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <QuickActions />
-        </div>
-
-        {/* Latest Resources */}
-        <div className="mb-8">
-          {/* <LatestResources resources={resourcesData.videos} /> */}
-          <LatestResources
-  resources={[
-    ...(resourcesData.videos || []),
-    ...(resourcesData.guides || []),
-    ...(resourcesData.exercises || [])
-  ]}
-/>
 
         </div>
 
-        {/* Community + Wellness Sections */}
-        <div className="mb-8">
-          <CommunityHighlights communities={communitiesData} />
-          <div className="mb-8">
-            <WellnessTip />
-          </div>
-          <div className="mb-8">
-            <WellnessJourney />
-          </div>
-          <div>
-            <EmergencySupport />
-          </div>
-        </div>
+        <UpcomingAppointments appointments={appointmentsData} />
+
+        <QuickActions />
+
+        <LatestResources
+          resources={[
+            ...resourcesData.videos,
+            ...resourcesData.guides,
+            ...resourcesData.exercises
+          ]}
+        />
+
+        <CommunityHighlights communities={communitiesData} />
+
+        <WellnessTip />
+
+        <WellnessJourney />
+
+        <EmergencySupport />
+
       </main>
+
     </div>
   );
 }
