@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import CalmPuzzle from "./games/calm_puzzle.jsx";
+import MoodMatch from "./games/MoodMatch.jsx";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -89,6 +91,28 @@ const games = [
     highScore: 156,
   },
   {
+    id: "calm_puzzle",
+    title: "Calm Puzzle",
+    description: "Relax and solve tranquil nature puzzles.",
+    duration: "5-10 minutes",
+    type: "Wellness Game",
+    icon: "🧩",
+    color: "bg-blue-400",
+    highScore: null,
+    component: "calm_puzzle",
+  },
+  {
+    id: "mood_match",
+    title: "Mood Match",
+    description: "Match emotions and boost your mood awareness.",
+    duration: "5-10 minutes",
+    type: "Wellness Game",
+    icon: "😌",
+    color: "bg-green-400",
+    highScore: null,
+    component: "MoodMatch",
+  },
+  {
     id: "4",
     title: "Stress Ball Squeeze",
     description: "Digital stress relief through interactive squeezing motions",
@@ -152,6 +176,7 @@ export default function Quizzes() {
   const { toast } = useToast();
   const [user, setUser] = useState(null);
   const [popupGame, setPopupGame] = useState<any>(null);
+  const [showGameModal, setShowGameModal] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -227,10 +252,16 @@ export default function Quizzes() {
   };
 
   const startGame = (game: any) => {
-    toast({
-      title: `Starting ${game.title}`,
-      description: "Game is loading... Have fun!",
-    });
+    if (game.component === "calm_puzzle") {
+      setShowGameModal("calm_puzzle");
+    } else if (game.component === "MoodMatch") {
+      setShowGameModal("MoodMatch");
+    } else {
+      toast({
+        title: `Starting ${game.title}`,
+        description: "Game is loading... Have fun!",
+      });
+    }
   };
 
   if (activeQuiz) {
@@ -305,6 +336,25 @@ export default function Quizzes() {
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-7xl">
+      {/* Modal for Calm Puzzle and Mood Match */}
+      {showGameModal === "calm_puzzle" && (
+        <div style={{position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center"}} onClick={() => setShowGameModal(null)}>
+          <div style={{position: "relative", background: "#fff", borderRadius: "16px", boxShadow: "0 4px 32px rgba(0,0,0,0.2)", padding: "1rem", maxWidth: "900px", width: "90vw", maxHeight: "90vh", overflow: "auto"}} onClick={e => e.stopPropagation()}>
+            <button style={{position: "absolute", top: 8, right: 12, background: "#eee", border: "none", borderRadius: "50%", width: 32, height: 32, fontSize: 20, cursor: "pointer"}} onClick={() => setShowGameModal(null)} aria-label="Close">×</button>
+            <h2 style={{marginBottom: "1rem"}}>Calm Puzzle</h2>
+            <CalmPuzzle />
+          </div>
+        </div>
+      )}
+      {showGameModal === "MoodMatch" && (
+        <div style={{position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center"}} onClick={() => setShowGameModal(null)}>
+          <div style={{position: "relative", background: "#fff", borderRadius: "16px", boxShadow: "0 4px 32px rgba(0,0,0,0.2)", padding: "1rem", maxWidth: "900px", width: "90vw", maxHeight: "90vh", overflow: "auto"}} onClick={e => e.stopPropagation()}>
+            <button style={{position: "absolute", top: 8, right: 12, background: "#eee", border: "none", borderRadius: "50%", width: 32, height: 32, fontSize: 20, cursor: "pointer"}} onClick={() => setShowGameModal(null)} aria-label="Close">×</button>
+            <h2 style={{marginBottom: "1rem"}}>Mood Match</h2>
+            <MoodMatch />
+          </div>
+        </div>
+      )}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Quizzes & Games</h1>
         <p className="text-muted-foreground">
