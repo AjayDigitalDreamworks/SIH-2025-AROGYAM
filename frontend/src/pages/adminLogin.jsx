@@ -21,7 +21,7 @@ export default function AdminLogin() {
         password,
       });
 
-      localStorage.setItem("adminToken", res.data.token);
+      localStorage.setItem("token", res.data.token);
       window.location.href = "/admin";
     } catch (err) {
       setError(err?.response?.data?.message || "Login failed");

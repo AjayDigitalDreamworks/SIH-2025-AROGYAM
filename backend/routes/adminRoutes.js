@@ -42,4 +42,10 @@ router.post('/register', verifyToken, async (req, res) => {
 });
 
 
+// admin dashboard route
+router.get('/dashboard', verifyToken, async (req, res) => {
+    res.json({ message: "Welcome to the admin dashboard", user : req.user });
+});
+
+
 module.exports = router;
