@@ -42,11 +42,14 @@ import CounsellorAppointments from "./pages/CounsellorAppointments";
 import StudentDetails from "./pages/StudentDetails";
 
 // Admin pages
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./adminDashboard/pages/Index";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
-import AdminRegisterCounsellor from "./pages/AdminRegisterCounsellor";
-import AdminResources from "./pages/AdminResources";
-import AdminEmergency from "./pages/AdminEmergency";
+import AdminRegisterCounsellor from "./adminDashboard/pages/CounsellingCenter";
+import AdminResources from "./adminDashboard/pages/Resources";
+import AdminEmergency from "./adminDashboard/pages/RiskDetection";
+import AdminAnalysis from "./adminDashboard/pages/Analytics";
+import AdminPeerSupport from "./adminDashboard/pages/PeerSupport";
+import AdminSetting from "./adminDashboard/pages/Settings";
 import AdminLogin from "./pages/adminLogin";
 import AdminSignup from "./pages/adminSignup"
 
@@ -105,12 +108,16 @@ const App = () => (
             <Route path="/students/:id" element={<StudentDetails />} />
 
             {/* Admin routes (now protected) */}
-            <Route path="/admin" element={<AdminProtectedRoute><Layout><AdminDashboard /></Layout></AdminProtectedRoute>} />
-            <Route path="/admin/register-counsellor" element={<Layout><AdminRegisterCounsellor /></Layout>} />
-            <Route path="/admin/resources" element={<Layout><AdminResources /></Layout>} />
-            <Route path="/admin/emergency" element={<Layout><AdminEmergency /></Layout>} />
+            {/* <Route path="/admin" element={<AdminProtectedRoute><Layout><AdminDashboard /></Layout></AdminProtectedRoute>} /> */}
+            <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/register-counsellor" element={<AdminRegisterCounsellor />} />
+            <Route path="/admin/resources" element={<AdminProtectedRoute><AdminResources /></AdminProtectedRoute>} />
+            <Route path="/admin/emergency" element={<AdminProtectedRoute><AdminEmergency /></AdminProtectedRoute>} />
+            <Route path="/admin/analytics" element={<AdminProtectedRoute><AdminAnalysis /></AdminProtectedRoute>} />
+            <Route path="/admin/peer-support" element={<AdminProtectedRoute><AdminPeerSupport /></AdminProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/signup" element={<AdminSignup />} />
+            <Route path="/admin/signup" element={<AdminProtectedRoute><AdminSignup /></AdminProtectedRoute>} />
+            <Route path="/admin/settings" element={<AdminProtectedRoute><AdminSetting /></AdminProtectedRoute>} />
 
             {/* Catch-all for unmatched routes */}
             {/* <Route path="*" element={<NotFound />} /> */}

@@ -1,5 +1,5 @@
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { PageHeader } from "@/components/PageHeader";
+import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
+import { PageHeader } from "../componentsAdmin/PageHeader";
 import { User, Bell, Shield, Palette, Globe, Lock, Mail, Phone, Save, ChevronRight, ToggleRight } from "lucide-react";
 import { useState } from "react";
 

@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { PageHeader } from "@/components/PageHeader";
-import { TipBanner } from "@/components/TipBanner";
+import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
+import { PageHeader } from "../componentsAdmin/PageHeader";
+import { TipBanner } from "../componentsAdmin/TipBanner";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 
 const days = ["Mend", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sat"];

@@ -1,5 +1,5 @@
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { PageHeader } from "@/components/PageHeader";
+import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
+import { PageHeader } from "../componentsAdmin/PageHeader";
 import { Users, MessageCircle, Heart, Star, Clock, Video, ChevronRight, Shield } from "lucide-react";
 
 const peerMentors = [

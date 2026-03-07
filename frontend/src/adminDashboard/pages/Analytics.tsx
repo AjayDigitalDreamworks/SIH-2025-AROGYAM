@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { PageHeader } from "@/components/PageHeader";
-import { TipBanner } from "@/components/TipBanner";
+import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
+import { PageHeader } from "../componentsAdmin/PageHeader";
+import { TipBanner } from "../componentsAdmin/TipBanner";
 import { ChevronLeft, ChevronRight, Download, Eye, TrendingUp, TrendingDown, AlertTriangle, FileText, Trophy } from "lucide-react";
 import {
   BarChart,

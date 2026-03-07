@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { PageHeader } from "@/components/PageHeader";
-import { TipBanner } from "@/components/TipBanner";
+import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
+import { PageHeader } from "../componentsAdmin/PageHeader";
+import { TipBanner } from "../componentsAdmin/TipBanner";
 import {
   Users,
   AlertTriangle,
@@ -12,7 +12,7 @@ import {
   Phone,
   ChevronRight,
 } from "lucide-react";
-import studentHero from "@/assets/student-hero.png";
+import studentHero from "../../assets/student-hero.png";
 import {
   LineChart,
   Line,
@@ -107,7 +107,7 @@ const Index = () => {
                 1,140 Students
               </span>
             </div>
-            <img src={studentHero} alt="Student" className="w-28 h-28 object-contain" />
+            <img src={studentHero} alt="Student"  className="w-28 h-28 object-contain" />
           </div>
         </div>
 
