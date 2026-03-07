@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import './index1.css'
 
 // If a token is passed in the URL fragment (e.g. after server-side OAuth/login),
 // store it in localStorage under the frontend origin so API calls can use it.
