@@ -6,6 +6,7 @@ import {
   ArrowLeft, ThumbsUp, Share2, Pin, Users, Send,
   CheckCircle2, MoreHorizontal, Bookmark
 } from "lucide-react";
+import "./CommunityForum.css";
 
 // ─── Community Content Data ───────────────────────────────────────────────────
 const communityContent = {
