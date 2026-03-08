@@ -153,77 +153,7 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
   );
 }
 
-function Header({ setMobileOpen }) {
-  return (
-    <header style={{
-      height: "64px", background: "#fff",
-      borderBottom: "1px solid #f0eeff",
-      display: "flex", alignItems: "center",
-      padding: "0 24px",
-      gap: "16px",
-      boxShadow: "0 1px 10px rgba(124,58,237,0.05)",
-      position: "sticky", top: 0, zIndex: 10,
-    }}>
-      <button
-        className="lg:hidden"
-        onClick={() => setMobileOpen(o => !o)}
-        style={{ background: "none", border: "none", cursor: "pointer", color: "#7c3aed" }}
-      >
-        <Menu size={22} />
-      </button>
 
-      {/* Search */}
-      <div style={{
-        flex: 1, maxWidth: "420px",
-        position: "relative"
-      }}>
-        <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#b0a3d4" }} />
-        <input
-          placeholder="Search resources, articles..."
-          style={{
-            width: "100%", padding: "9px 12px 9px 36px",
-            borderRadius: "10px", border: "1.5px solid #e9e4ff",
-            background: "#faf8ff", fontSize: "13.5px",
-            color: "#4b3f8c", outline: "none",
-            transition: "border-color 0.2s"
-          }}
-          onFocus={e => e.target.style.borderColor = "#7c3aed"}
-          onBlur={e => e.target.style.borderColor = "#e9e4ff"}
-        />
-      </div>
-
-      <div style={{ flex: 1 }} />
-
-      {/* Right icons */}
-      <button style={{
-        width: "38px", height: "38px", borderRadius: "10px",
-        background: "#f5f2ff", border: "none", cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "#7c3aed", position: "relative"
-      }}>
-        <Bell size={18} />
-        <span style={{
-          position: "absolute", top: "7px", right: "7px",
-          width: "8px", height: "8px", borderRadius: "50%",
-          background: "#10b981", border: "2px solid #fff"
-        }} />
-      </button>
-
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: "13px", fontWeight: 600, color: "#2d1b69" }}>anshul mangla</div>
-          <div style={{ fontSize: "11px", color: "#9b8ec4" }}>shiv@gmail.com</div>
-        </div>
-        <div style={{
-          width: "38px", height: "38px", borderRadius: "50%",
-          background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontWeight: 700, fontSize: "14px"
-        }}>A</div>
-      </div>
-    </header>
-  );
-}
 
 function SettingsSidebar({ activeTab, setActiveTab }) {
   return (
@@ -980,7 +910,7 @@ export default function SettingsPage() {
       `}</style>
 
       <BackgroundBlobs />
-      <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      {/* <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} /> */}
 
       {/* Main area */}
       <div style={{ flex: 1, marginLeft: "220px", display: "flex", flexDirection: "column", position: "relative", zIndex: 1, minHeight: "100vh" }}
@@ -990,7 +920,7 @@ export default function SettingsPage() {
           @media (max-width: 1023px) { .main-area { margin-left: 0 !important; } }
         `}</style>
 
-        <Header setMobileOpen={setMobileOpen} />
+        {/* <Header setMobileOpen={setMobileOpen} /> */}
 
         <main style={{ flex: 1, padding: "28px 28px 40px", maxWidth: "1100px", width: "100%" }}>
           {/* Page Title */}

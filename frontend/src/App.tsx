@@ -24,6 +24,7 @@ import MoodMatch from "./pages/games/MoodMatch";
 import MindGarden from "./pages/games/MindGarden";
 import BreathingGame from "./pages/games/arogyam_breathing_game";
 import Rewards from "./pages/StudentRewardPage";
+import SettingsofStudent from "./pages/SettingsPage"
 
 // import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
@@ -113,6 +114,7 @@ const App = () => (
             <Route path="/exercise" element={<Layout><Exercise /></Layout>} />
             <Route path="/crisis" element={<Layout><Crisis /></Layout>} />
             <Route path="/rewards" element={<Layout><Rewards /></Layout>} />
+            <Route path="/setting" element={<Layout><SettingsofStudent /></Layout> }/>
           
 
             {/* Counsellor routes */}

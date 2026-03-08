@@ -11,6 +11,8 @@ import {
   Dumbbell,
   Phone,
   Star,
+  Settings,
+  Award 
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -39,10 +41,13 @@ const wellnessToolsItems = [
   { title: "Mood Tracker", url: "/mood", icon: Heart },
   { title: "Sleep Tracker", url: "/sleep", icon: Moon },
   { title: "Exercise Plans", url: "/exercise", icon: Dumbbell },
+  { title: "Rewards & redeem", url: "/rewards", icon: Award },
 ];
 
 const supportItems = [
-  { title: "Crisis Helpline", url: "/crisis", icon: Phone }
+  { title: "Crisis Helpline", url: "/crisis", icon: Phone },
+
+  { title: "Settings", url: "/setting", icon: Settings }
   
 ];
 

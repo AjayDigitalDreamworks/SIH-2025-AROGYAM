@@ -196,61 +196,61 @@ import axios from "axios";
 
 export default function Settings() {
 
-const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("profile")
 
-const [profile,setProfile] = useState({
-name:"",
-email:"",
-phone:"",
-role:"",
-department:"",
-campus:""
-})
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    department: "",
+    campus: ""
+  })
 
-useEffect(()=>{
-fetchProfile()
-},[])
+  useEffect(() => {
+    fetchProfile()
+  }, [])
 
-const fetchProfile = async ()=>{
-try{
+  const fetchProfile = async () => {
+    try {
 
-const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token")
 
-const res = await axios.get(
-"http://localhost:3000/api/admin/profile",
-{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+      const res = await axios.get(
+        "http://localhost:3000/api/admin/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
 
-setProfile(res.data)
+      setProfile(res.data)
 
-}catch(err){
-console.log(err)
-}
-}
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
-const saveProfile = async ()=>{
-try{
+  const saveProfile = async () => {
+    try {
 
-const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token")
 
-await axios.put(
-"http://localhost:3000/api/admin/profile",
-profile,
-{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+      await axios.put(
+        "http://localhost:3000/api/admin/profile",
+        profile,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
 
-alert("Profile Updated")
+      alert("Profile Updated")
 
-}catch(err){
-console.log(err)
-}
-}
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -269,17 +269,16 @@ console.log(err)
 
         <div className="glass-card p-4 space-y-1">
 
-          {tabs.map((tab)=>(
+          {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={()=>setActiveTab(tab.id)}
-              className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeTab===tab.id
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground hover:bg-accent"
-              }`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:bg-accent"
+                }`}
             >
-              <tab.icon className="w-4 h-4"/>
+              <tab.icon className="w-4 h-4" />
               {tab.label}
             </button>
           ))}
@@ -292,7 +291,7 @@ console.log(err)
 
           {/* PROFILE TAB */}
 
-          {activeTab==="profile" && (
+          {activeTab === "profile" && (
 
             <div>
 
@@ -305,10 +304,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Full Name</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <User className="w-4 h-4 text-muted-foreground"/>
+                    <User className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.name}
-                      onChange={(e)=>setProfile({...profile,name:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -317,10 +316,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Email</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <Mail className="w-4 h-4 text-muted-foreground"/>
+                    <Mail className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.email}
-                      onChange={(e)=>setProfile({...profile,email:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -329,10 +328,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Phone</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <Phone className="w-4 h-4 text-muted-foreground"/>
+                    <Phone className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.phone}
-                      onChange={(e)=>setProfile({...profile,phone:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -341,10 +340,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Role</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <Shield className="w-4 h-4 text-muted-foreground"/>
+                    <Shield className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.role}
-                      onChange={(e)=>setProfile({...profile,role:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, role: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -353,10 +352,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Department</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <Globe className="w-4 h-4 text-muted-foreground"/>
+                    <Globe className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.department}
-                      onChange={(e)=>setProfile({...profile,department:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, department: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -365,10 +364,10 @@ console.log(err)
                 <div>
                   <label className="text-xs text-muted-foreground">Campus</label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/70 border border-border">
-                    <Globe className="w-4 h-4 text-muted-foreground"/>
+                    <Globe className="w-4 h-4 text-muted-foreground" />
                     <input
                       value={profile.campus}
-                      onChange={(e)=>setProfile({...profile,campus:e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, campus: e.target.value })}
                       className="bg-transparent text-sm w-full outline-none"
                     />
                   </div>
@@ -381,7 +380,7 @@ console.log(err)
                   onClick={saveProfile}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
                 >
-                  <Save className="w-4 h-4"/> Save Changes
+                  <Save className="w-4 h-4" /> Save Changes
                 </button>
               </div>
 
