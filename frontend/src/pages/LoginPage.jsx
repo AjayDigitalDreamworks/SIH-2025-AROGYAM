@@ -383,7 +383,7 @@ const LoginForm = () => {
       {/* create account */}
       <p style={{textAlign:"center",fontFamily:"'DM Sans',sans-serif",fontSize:"0.85rem",color:"#8AAAC8",marginTop:"0.8rem",marginBottom:0}}>
         Don't have an account?{" "}
-        <a href="#" style={{color:"#4A7EB8",fontWeight:700,textDecoration:"none"}}
+        <a href="/signup" style={{color:"#4A7EB8",fontWeight:700,textDecoration:"none"}}
           onMouseEnter={e=>e.target.style.color="#2D5A90"} onMouseLeave={e=>e.target.style.color="#4A7EB8"}>
           Create Account
         </a>
