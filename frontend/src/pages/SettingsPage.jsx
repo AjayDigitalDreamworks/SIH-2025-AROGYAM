@@ -10,25 +10,6 @@ import {
   AlertCircle, RefreshCw, Shield, Fingerprint, Clock
 } from "lucide-react";
 
-const sidebarLinks = [
-  { section: "MAIN MENU", items: [
-    { label: "Dashboard", icon: LayoutDashboard },
-    { label: "AI Chatbot", icon: Bot },
-    { label: "Book Appointment", icon: CalendarDays },
-    { label: "Resource Hub", icon: BookOpen },
-    { label: "Community Forum", icon: Users },
-  ]},
-  { section: "WELLNESS TOOLS", items: [
-    { label: "Quizzes & Games", icon: Gamepad2 },
-    { label: "Mood Tracker", icon: Heart },
-    { label: "Sleep Tracker", icon: Moon },
-    { label: "Exercise Plans", icon: Dumbbell },
-  ]},
-  { section: "SUPPORT", items: [
-    { label: "Crisis Helpline", icon: Phone },
-    { label: "Settings", icon: Settings, active: true },
-  ]},
-];
 
 const settingsTabs = [
   { label: "Profile", icon: User },
@@ -41,117 +22,7 @@ const departments = ["Student Welfare", "Mental Health", "Academic Support", "He
 const roles = ["Head Counsellor", "Counsellor", "Admin", "Supervisor"];
 const campuses = ["Main Campus, Bangalore", "North Campus, Delhi", "East Campus, Mumbai", "South Campus, Chennai"];
 
-function BackgroundBlobs() {
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-      <div style={{
-        position: "absolute", top: "-80px", right: "-80px",
-        width: "400px", height: "400px", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "10%", left: "15%",
-        width: "300px", height: "300px", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)",
-      }} />
-      <div style={{
-        position: "absolute", top: "40%", right: "10%",
-        width: "200px", height: "200px", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%)",
-      }} />
-      {/* Leaf decorations */}
-      <svg style={{ position: "absolute", bottom: "5%", right: "5%", opacity: 0.04 }} width="180" height="180" viewBox="0 0 180 180">
-        <ellipse cx="90" cy="90" rx="80" ry="40" fill="#7c3aed" transform="rotate(-30 90 90)" />
-        <ellipse cx="90" cy="90" rx="80" ry="40" fill="#7c3aed" transform="rotate(30 90 90)" />
-      </svg>
-      <svg style={{ position: "absolute", top: "15%", left: "20%", opacity: 0.035 }} width="120" height="120" viewBox="0 0 120 120">
-        <ellipse cx="60" cy="60" rx="55" ry="25" fill="#8b5cf6" transform="rotate(-45 60 60)" />
-        <ellipse cx="60" cy="60" rx="55" ry="25" fill="#8b5cf6" transform="rotate(45 60 60)" />
-      </svg>
-    </div>
-  );
-}
 
-function Sidebar({ mobileOpen, setMobileOpen }) {
-  return (
-    <>
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 z-20 lg:hidden" onClick={() => setMobileOpen(false)} />
-      )}
-      <aside style={{
-        width: "220px", minWidth: "220px",
-        background: "#fff",
-        borderRight: "1px solid #f0eeff",
-        display: "flex", flexDirection: "column",
-        padding: "0",
-        zIndex: 30,
-        position: "fixed",
-        top: 0, left: 0, bottom: 0,
-        transform: mobileOpen ? "translateX(0)" : undefined,
-        transition: "transform 0.3s ease",
-        boxShadow: "2px 0 16px rgba(124,58,237,0.06)"
-      }}
-      className={`${mobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
-      >
-        {/* Logo */}
-        <div style={{ padding: "22px 20px 18px", borderBottom: "1px solid #f3f0ff", display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{
-            width: "36px", height: "36px", borderRadius: "10px",
-            background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-            display: "flex", alignItems: "center", justifyContent: "center"
-          }}>
-            <Heart size={18} color="#fff" fill="#fff" />
-          </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: "15px", color: "#2d1b69", letterSpacing: "-0.3px" }}>Arogyam</div>
-            <div style={{ fontSize: "11px", color: "#9b8ec4" }}>Student Wellness</div>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <nav style={{ flex: 1, overflowY: "auto", padding: "12px 12px" }}>
-          {sidebarLinks.map(group => (
-            <div key={group.section} style={{ marginBottom: "8px" }}>
-              <div style={{ fontSize: "10px", fontWeight: 700, color: "#b0a3d4", letterSpacing: "0.8px", padding: "8px 8px 4px", textTransform: "uppercase" }}>
-                {group.section}
-              </div>
-              {group.items.map(item => (
-                <button key={item.label} style={{
-                  display: "flex", alignItems: "center", gap: "10px",
-                  width: "100%", padding: "9px 10px", borderRadius: "9px",
-                  border: "none", cursor: "pointer", textAlign: "left",
-                  background: item.active ? "linear-gradient(135deg, #7c3aed15, #a78bfa15)" : "transparent",
-                  color: item.active ? "#7c3aed" : "#6b7280",
-                  fontWeight: item.active ? 600 : 500,
-                  fontSize: "13.5px",
-                  transition: "all 0.15s",
-                  marginBottom: "1px",
-                  borderLeft: item.active ? "3px solid #7c3aed" : "3px solid transparent"
-                }}>
-                  <item.icon size={16} />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          ))}
-        </nav>
-
-        {/* Logout */}
-        <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f0ff" }}>
-          <button style={{
-            display: "flex", alignItems: "center", gap: "8px",
-            color: "#ef4444", fontSize: "13.5px", fontWeight: 500,
-            background: "none", border: "none", cursor: "pointer"
-          }}>
-            <LogOut size={15} />
-            Logout
-          </button>
-        </div>
-      </aside>
-    </>
-  );
-}
 
 
 
@@ -909,7 +780,6 @@ export default function SettingsPage() {
         ::-webkit-scrollbar-thumb { background: #d4c9ff; border-radius: 4px; }
       `}</style>
 
-      <BackgroundBlobs />
       {/* <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} /> */}
 
       {/* Main area */}

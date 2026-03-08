@@ -1,20 +1,20 @@
 import { useState } from "react";
 
-const mainMenu = [
-  { label: "Dashboard", icon: "🏠" },
-  { label: "AI Chatbot", icon: "🤖" },
-  { label: "Book Appointment", icon: "📅" },
-  { label: "Resource Hub", icon: "📖" },
-  { label: "Community Forum", icon: "👥" },
-];
-const wellnessTools = [
-  { label: "Quizzes & Games", icon: "🎮" },
-  { label: "Mood Tracker", icon: "❤️" },
-  { label: "Sleep Tracker", icon: "😴" },
-  { label: "Exercise Plans", icon: "🏃" },
-  { label: "Rewards", icon: "⭐" },
-];
-const support = [{ label: "Crisis Helpline", icon: "📞" }];
+// const mainMenu = [
+//   { label: "Dashboard", icon: "🏠" },
+//   { label: "AI Chatbot", icon: "🤖" },
+//   { label: "Book Appointment", icon: "📅" },
+//   { label: "Resource Hub", icon: "📖" },
+//   { label: "Community Forum", icon: "👥" },
+// ];
+// const wellnessTools = [
+//   { label: "Quizzes & Games", icon: "🎮" },
+//   { label: "Mood Tracker", icon: "❤️" },
+//   { label: "Sleep Tracker", icon: "😴" },
+//   { label: "Exercise Plans", icon: "🏃" },
+//   { label: "Rewards", icon: "⭐" },
+// ];
+// const support = [{ label: "Crisis Helpline", icon: "📞" }];
 
 const achievements = [
   { icon: "🏅", title: "First Activity", desc: "Completed your first activity", unlocked: true },
@@ -50,30 +50,30 @@ function SectionTitle({ children }) {
   return <h2 className="text-lg font-semibold text-gray-800 mb-4">{children}</h2>;
 }
 
-function NavSection({ label, items, active, setActive }) {
-  return (
-    <div className="mb-5">
-      <p className="text-xs text-gray-400 font-semibold mb-2 px-1 tracking-wide">{label}</p>
-      <ul className="space-y-0.5">
-        {items.map((item) => (
-          <li key={item.label}>
-            <button
-              onClick={() => setActive(item.label)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
-                active === item.label
-                  ? "bg-purple-600 text-white font-semibold"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <span className="text-base">{item.icon}</span>
-              {item.label}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+// function NavSection({ label, items, active, setActive }) {
+//   return (
+//     <div className="mb-5">
+//       <p className="text-xs text-gray-400 font-semibold mb-2 px-1 tracking-wide">{label}</p>
+//       <ul className="space-y-0.5">
+//         {items.map((item) => (
+//           <li key={item.label}>
+//             <button
+//               onClick={() => setActive(item.label)}
+//               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
+//                 active === item.label
+//                   ? "bg-purple-600 text-white font-semibold"
+//                   : "text-gray-600 hover:bg-gray-100"
+//               }`}
+//             >
+//               <span className="text-base">{item.icon}</span>
+//               {item.label}
+//             </button>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// }
 
 export default function ArogyamRewardPage() {
   const [store, setStore] = useState(initialStore);
@@ -89,52 +89,10 @@ export default function ArogyamRewardPage() {
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-52 bg-white border-r border-gray-100 flex flex-col py-5 px-4 shrink-0 overflow-y-auto">
-        <div className="flex items-center gap-2 mb-8 px-1">
-          <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
-            <span className="text-white text-lg">❤️</span>
-          </div>
-          <div>
-            <p className="font-bold text-gray-800 text-sm leading-tight">Arogyam</p>
-            <p className="text-xs text-gray-400">Student Wellness</p>
-          </div>
-        </div>
-        <NavSection label="MAIN MENU" items={mainMenu} active={activeNav} setActive={setActiveNav} />
-        <NavSection label="WELLNESS TOOLS" items={wellnessTools} active={activeNav} setActive={setActiveNav} />
-        <NavSection label="SUPPORT" items={support} active={activeNav} setActive={setActiveNav} />
-      </aside>
-
+     
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-100 px-6 py-3 flex items-center gap-4 shrink-0">
-          <button className="text-gray-400 hover:text-gray-600">☰</button>
-          <div className="flex-1 max-w-md">
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-              <span className="text-gray-400 text-sm">🔍</span>
-              <input
-                className="bg-transparent text-sm text-gray-600 placeholder-gray-400 outline-none w-full"
-                placeholder="Search resources, articles..."
-              />
-            </div>
-          </div>
-          <div className="ml-auto flex items-center gap-3">
-            <span className="text-gray-400 cursor-pointer text-lg">⚙️</span>
-            <div className="relative">
-              <span className="text-gray-400 cursor-pointer text-lg">🔔</span>
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-700">anshul mangla</p>
-                <p className="text-xs text-gray-400">shiv@gmail.com</p>
-              </div>
-              <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">A</div>
-              <button className="text-sm text-red-400 font-medium hover:text-red-600 ml-1">Logout</button>
-            </div>
-          </div>
-        </header>
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
