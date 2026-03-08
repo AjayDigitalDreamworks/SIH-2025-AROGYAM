@@ -125,7 +125,7 @@ const UserSchema = new mongoose.Schema({
   },
   yearOfStudy: {
     type: String,
-    enum: ['Freshman','Sophomore','Junior','Senior','1st year', '2nd year', '3rd year', '4th year', 'Graduate','Other'],
+    enum: ['1','2','3','4'],
   },
 
   role: {

@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-
+import React, { useState } from "react";
+import axios from "axios";
 /* ─── LOTUS LOGO ─────────────────────────────────────────────────────────── */
 const LotusLogo = () => (
   <svg width="42" height="38" viewBox="0 0 42 38" fill="none">
@@ -239,261 +239,144 @@ const AvatarPicker = ({ value, onChange }) => {
 };
 
 /* ─── SIGN UP FORM ───────────────────────────────────────────────────────── */
+
+
+
 const SignUpForm = () => {
-  /* individual state for each field — avoids any closure/batching issues */
-  const [displayName, setDisplayName] = useState("");
-  const [fullName,    setFullName]    = useState("");
-  const [email,       setEmail]       = useState("");
-  const [phone,       setPhone]       = useState("");
-  const [password,    setPassword]    = useState("");
-  const [avatar,      setAvatar]      = useState("🎓");
-  const [university,  setUniversity]  = useState("");
-  const [yearOfStudy, setYearOfStudy] = useState("");
+ 
+    const [formData, setFormData] = useState({
+        username: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        password: '',
+        avatar: '🎓',
+        university: '',
+        yearOfStudy: ''
+    });
+    const [errorMessage, setErrorMessage] = useState('');
 
-  const [showPass, setShowPass] = useState(false);
-  const [focused,  setFocused]  = useState("");
-  const [errors,   setErrors]   = useState({});
-  const [loading,  setLoading]  = useState(false);
-  const [success,  setSuccess]  = useState(false);
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
-  const validate = () => {
-    const e = {};
-    if (!displayName.trim())                          e.displayName = "Display name is required";
-    if (!fullName.trim())                             e.fullName    = "Full name is required";
-    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) e.email      = "A valid email is required";
-    if (password.length < 6)                          e.password    = "Minimum 6 characters";
-    return e;
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-  const handleSubmit = () => {
-    const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
-    setErrors({});
-    setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
-  };
+        // Ensure required fields are filled
+        const { username, fullName, email, password } = formData;
+        if (!email || !password || !fullName || !username) {
+            alert('Please fill in all required fields.');
+            return;
+        }
 
-  if (success) {
-    return (
-      <div style={{
-        background: "rgba(255,255,255,0.88)", backdropFilter: "blur(18px)",
-        borderRadius: "22px", boxShadow: "0 8px 40px rgba(90,140,190,0.2)",
-        padding: "3rem 2.3rem", width: "100%", maxWidth: "430px",
-        border: "1.5px solid rgba(255,255,255,0.85)", textAlign: "center"
-      }}>
-        <div style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>🎉</div>
-        <h2 style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#1E3A5A", marginBottom: "0.5rem" }}>
-          Account Created!
-        </h2>
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.9rem", color: "#8AAAC8", marginBottom: "1.5rem" }}>
-          Welcome to Arogyam, {displayName} {avatar}
-        </p>
-        <button onClick={() => setSuccess(false)} style={{
-          padding: "0.8rem 2rem", background: "linear-gradient(135deg,#6BA5D8,#4480B8)",
-          border: "none", borderRadius: "13px", color: "white",
-          fontFamily: "'DM Sans',sans-serif", fontSize: "0.9rem", fontWeight: 700,
-          cursor: "pointer", boxShadow: "0 4px 18px rgba(74,128,184,0.4)"
-        }}>Back to Sign Up</button>
-      </div>
+      
+        console.log('Submitting signup form with data:', formData)
+
+try {
+    const response = await axios.post(
+        'http://localhost:3000/api/auth/signup',
+        formData,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
     );
-  }
+
+    console.log('Signup response:', response)
+
+    // Axios automatically parses JSON
+    const result = response.data;
+
+    alert(result.message || 'Signup successful!');
+    window.location.href = '/login'; // Redirect after successful sign-up
+
+} catch (error) {
+    console.error('Error during sign-up:', error);
+
+    if (error.response) {
+        // Server responded with a status outside 2xx
+        setErrorMessage(error.response.data?.message || 'Something went wrong.');
+    } else {
+        // Network / other error
+        alert('An error occurred. Please try again later.');
+    }
+}
+    };
 
   return (
     <div style={{
-      background: "rgba(255,255,255,0.88)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
-      borderRadius: "22px", boxShadow: "0 8px 40px rgba(90,140,190,0.2), 0 2px 10px rgba(90,140,190,0.1)",
-      padding: "2.2rem 2.3rem 2rem", width: "100%", maxWidth: "430px",
-      border: "1.5px solid rgba(255,255,255,0.85)",
-    }}>
-      {/* Header */}
-      <h2 style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "1.9rem", fontWeight: 800, color: "#1E3A5A", margin: "0 0 0.2rem", letterSpacing: "-0.025em" }}>
-        Sign Up
-      </h2>
-      <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", color: "#8AAAC8", margin: "0 0 1.4rem" }}>
-        Create your Arogyam account
-      </p>
-
-      {/* Scrollable field group */}
-      <div style={{
-        background: "rgba(238,246,255,0.55)", borderRadius: "14px",
-        padding: "1.2rem 1.1rem 0.5rem", marginBottom: "1.1rem",
-        border: "1px solid rgba(200,222,242,0.5)",
-        maxHeight: "370px", overflowY: "auto",
-        scrollbarWidth: "thin", scrollbarColor: "#C8DDED transparent",
-      }}>
-
-        {/* Display Name */}
-        <Field label="Display Name" required error={errors.displayName}>
-          <input
-            type="text"
-            value={displayName}
-            placeholder="How you'll appear to others"
-            style={getInputStyle(focused === "displayName", !!errors.displayName)}
-            onFocus={() => setFocused("displayName")}
-            onBlur={() => setFocused("")}
-            onChange={e => setDisplayName(e.target.value)}
-          />
-        </Field>
-
-        {/* Full Name */}
-        <Field label="Full Name" required error={errors.fullName}>
-          <input
-            type="text"
-            value={fullName}
-            placeholder="Your legal name"
-            style={getInputStyle(focused === "fullName", !!errors.fullName)}
-            onFocus={() => setFocused("fullName")}
-            onBlur={() => setFocused("")}
-            onChange={e => setFullName(e.target.value)}
-          />
-        </Field>
-
-        {/* Email */}
-        <Field label="Email" required error={errors.email}>
-          <input
-            type="email"
-            value={email}
-            placeholder="you@university.edu"
-            style={getInputStyle(focused === "email", !!errors.email)}
-            onFocus={() => setFocused("email")}
-            onBlur={() => setFocused("")}
-            onChange={e => setEmail(e.target.value)}
-          />
-        </Field>
-
-        {/* Phone */}
-        <Field label="Phone">
-          <input
-            type="tel"
-            value={phone}
-            placeholder="+91 00000 00000"
-            style={getInputStyle(focused === "phone", false)}
-            onFocus={() => setFocused("phone")}
-            onBlur={() => setFocused("")}
-            onChange={e => setPhone(e.target.value)}
-          />
-        </Field>
-
-        {/* Password */}
-        <Field label="Password" required error={errors.password}>
-          <div style={{ position: "relative" }}>
-            <input
-              type={showPass ? "text" : "password"}
-              value={password}
-              placeholder="Min 6 characters"
-              style={{ ...getInputStyle(focused === "password", !!errors.password), paddingRight: "4.5rem" }}
-              onFocus={() => setFocused("password")}
-              onBlur={() => setFocused("")}
-              onChange={e => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass(s => !s)}
-              style={{
-                position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)",
-                background: "none", border: "none", cursor: "pointer",
-                color: "#8AAFC8", fontFamily: "'DM Sans',sans-serif",
-                fontSize: "0.78rem", fontWeight: 600,
-                display: "flex", alignItems: "center", gap: "3px", padding: "2px",
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = "#4A7EA5"}
-              onMouseLeave={e => e.currentTarget.style.color = "#8AAFC8"}
-            >
-              {showPass ? <EyeHide /> : <span>Show</span>}
-            </button>
-          </div>
-        </Field>
-
-        {/* Avatar */}
-        <Field label="Avatar (emoji)">
-          <AvatarPicker value={avatar} onChange={setAvatar} />
-        </Field>
-
-        {/* University */}
-        <Field label="University">
-          <input
-            type="text"
-            value={university}
-            placeholder="Your institution"
-            style={getInputStyle(focused === "university", false)}
-            onFocus={() => setFocused("university")}
-            onBlur={() => setFocused("")}
-            onChange={e => setUniversity(e.target.value)}
-          />
-        </Field>
-
-        {/* Year of Study */}
-        <Field label="Year of Study">
-          <div style={{ position: "relative" }}>
-            <select
-              value={yearOfStudy}
-              style={{
-                ...getInputStyle(focused === "year", false),
-                appearance: "none", WebkitAppearance: "none",
-                paddingRight: "2.5rem",
-                cursor: "pointer",
-                color: yearOfStudy ? "#2D4A6B" : "#9BBDD6",
-              }}
-              onFocus={() => setFocused("year")}
-              onBlur={() => setFocused("")}
-              onChange={e => setYearOfStudy(e.target.value)}
-            >
-              <option value="" disabled>Select</option>
-              <option value="1">1st Year</option>
-              <option value="2">2nd Year</option>
-              <option value="3">3rd Year</option>
-              <option value="4">4th Year</option>
-              <option value="5">5th Year</option>
-              <option value="pg">Postgraduate</option>
-              <option value="phd">PhD</option>
-            </select>
-            <svg width="11" height="11" viewBox="0 0 12 8" fill="none"
-              style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", opacity: 0.5 }}>
-              <path d="M1 1.5l5 5 5-5" stroke="#5B7A95" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-        </Field>
-
-      </div>{/* end scroll area */}
-
-      {/* Sign Up Button */}
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={loading}
-        style={{
-          width: "100%", padding: "0.85rem",
-          background: loading ? "#88AACC" : "linear-gradient(135deg,#6BA5D8 0%,#5592C8 45%,#4480B8 100%)",
-          border: "none", borderRadius: "13px", color: "white",
-          fontFamily: "'DM Sans',sans-serif", fontSize: "0.95rem", fontWeight: 700,
-          cursor: loading ? "not-allowed" : "pointer",
-          boxShadow: "0 4px 20px rgba(74,128,184,0.42)",
-          transition: "all 0.22s", display: "flex", alignItems: "center",
-          justifyContent: "center", gap: "0.5rem",
-          marginBottom: "1rem", letterSpacing: "0.01em",
-        }}
-        onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "translateY(-1.5px)"; e.currentTarget.style.boxShadow = "0 8px 26px rgba(74,128,184,0.55)"; } }}
-        onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(74,128,184,0.42)"; }}
-      >
-        {loading ? (
-          <>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"
-              strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}>
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-            </svg>
-            Creating Account…
-          </>
-        ) : "Sign Up"}
-      </button>
-
-      {/* Login link */}
+  background: "rgba(255,255,255,0.88)",
+  borderRadius: "22px",
+  boxShadow: "0 8px 40px rgba(90,140,190,0.2)",
+  padding: "2.2rem 2.3rem 2rem",
+  width: "100%",
+  maxWidth: "430px",
+  border: "1.5px solid rgba(255,255,255,0.85)",
+  maxHeight: "80vh",
+  overflowY: "auto"
+}}>
+      <h2 style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "1.9rem", fontWeight: 800, color: "#1E3A5A", margin: "0 0 0.2rem", letterSpacing: "-0.025em" }}>Sign Up</h2>
+      <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", color: "#8AAAC8", margin: "0 0 1.4rem" }}>Create your Arogyam account</p>
+      {errorMessage && <div style={{ color: "#D06060", textAlign: "center", marginBottom: "1rem" }}>{errorMessage}</div>}
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Display Name *</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange} required style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="How you'll appear to others" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Full Name *</label>
+          <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="Your legal name" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Email *</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="you@university.edu" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Phone</label>
+          <input type="text" name="phone" value={formData.phone} onChange={handleChange} style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="+91 00000 00000" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Password *</label>
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="Min 6 characters" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Avatar (emoji)</label>
+          <input type="text" name="avatar" value={formData.avatar} onChange={handleChange} style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>University</label>
+          <input type="text" name="university" value={formData.university} onChange={handleChange} style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }} placeholder="Your institution" />
+        </div>
+        <div style={{ marginBottom: "0.9rem" }}>
+          <label style={{ fontWeight: 600 }}>Year of Study</label>
+          <select name="yearOfStudy" value={formData.yearOfStudy} onChange={handleChange} style={{ width: "100%", padding: "0.72rem 1rem", borderRadius: "10px", border: "1.5px solid #DDE8F2", marginTop: "0.3rem" }}>
+            <option value="">Select</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+           
+          </select>
+        </div>
+        <button type="submit" style={{
+          width: "100%", padding: "0.75rem 1rem", borderRadius: "10px",
+          background: "#3872B0", color: "white", fontFamily: "'DM Sans',sans-serif",
+          fontSize: "0.95rem", fontWeight: 600, border: "none",
+          cursor: "pointer", marginTop: "0.5rem",
+          transition: "background 0.18s",
+        }} onMouseEnter={e => e.currentTarget.style.background = "#2A5A8C"} onMouseLeave={e => e.currentTarget.style.background = "#3872B0"}>
+          Create Account
+        </button>
+      </form>
       <p style={{ textAlign: "center", fontFamily: "'DM Sans',sans-serif", fontSize: "0.85rem", color: "#8AAAC8", margin: 0 }}>
         Already have an account?{" "}
-        <a href="#" style={{ color: "#4A7EB8", fontWeight: 700, textDecoration: "none" }}
-          onMouseEnter={e => e.target.style.color = "#2D5A90"}
-          onMouseLeave={e => e.target.style.color = "#4A7EB8"}>
-          Login
-        </a>
+        <a href="/login" style={{ color: "#4A7EB8", fontWeight: 700, textDecoration: "none" }}>Login</a>
       </p>
     </div>
   );
