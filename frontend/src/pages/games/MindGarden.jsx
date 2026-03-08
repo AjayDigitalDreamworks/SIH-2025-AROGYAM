@@ -1,14 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// --- Google Font: Nunito ---
-if (!document.getElementById("nunito-font")) {
-  const link = document.createElement("link");
-  link.id = "nunito-font";
-  link.rel = "stylesheet";
-  link.href = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap";
-  document.head.appendChild(link);
-}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "mindgarden_v4";
@@ -421,6 +413,17 @@ export default function MindGarden() {
     return s;
   };
 
+  // Inject Nunito font once on mount
+  useEffect(() => {
+    if (!document.getElementById("nunito-font")) {
+      const link = document.createElement("link");
+      link.id = "nunito-font";
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap";
+      document.head.appendChild(link);
+    }
+  }, []);
+
   const [state, setState] = useState(initState);
   const [activePanel, setActivePanel] = useState(null);
   const [showStore, setShowStore] = useState(false);
@@ -595,7 +598,7 @@ export default function MindGarden() {
               </div>
               <p className="text-xs text-gray-400 mt-2">Activities locked until tomorrow 🌙</p>
               <button onClick={() => setCelebration(false)}
-                className="mt-4 px-7 py-2.5 rounded-xl text-white text-sm font-bold shadow"
+                className="mt-4 px-7 py-2 rounded-xl text-white text-sm font-bold shadow"
                 style={{ background:"linear-gradient(135deg,#10b981,#059669)" }}>
                 View Garden 🌿
               </button>
