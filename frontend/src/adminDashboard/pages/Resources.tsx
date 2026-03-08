@@ -257,7 +257,7 @@ const Resources = () => {
   const fetchResources = async ()=>{
     try{
 
-      const res = await axios.get("http://localhost:3000/videos/videos")
+      const res = await axios.get("https://arogyam-9rll.onrender.com/videos/videos")
 
       setResources(res.data.videos || res.data)
 
@@ -286,7 +286,7 @@ const Resources = () => {
       const token = localStorage.getItem("token")
 
       await axios.post(
-        "http://localhost:3000/videos/upload",
+        "https://arogyam-9rll.onrender.com/videos/upload",
         formData,
         {
           headers:{

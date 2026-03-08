@@ -40,7 +40,7 @@ export function Layout({ children }: LayoutProps) {
 
      
 
-    const res = await api.get(`http://localhost:3000/notifications/${userId}`);
+    const res = await api.get(`https://arogyam-9rll.onrender.com/notifications/${userId}`);
 
     setNotifications(res.data);
 

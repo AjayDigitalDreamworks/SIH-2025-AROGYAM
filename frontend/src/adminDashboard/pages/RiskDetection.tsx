@@ -251,7 +251,7 @@ fetchData()
 const fetchData = async ()=>{
 try{
 
-const res = await axios.get("http://localhost:3000/api/admin/risk")
+const res = await axios.get("https://arogyam-9rll.onrender.com/api/admin/risk")
 
 setRiskSummary(res.data.riskSummary)
 setStudents(res.data.students)

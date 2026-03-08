@@ -10,7 +10,7 @@ function Hybrid() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/hybrid/history");
+      const res = await axios.get("https://arogyam-9rll.onrender.com/api/hybrid/history");
       setHistory(res.data);
     } catch (err) {
       console.error(err);
@@ -24,7 +24,7 @@ function Hybrid() {
   const handleSubmit = async () => {
     if (!symptomLevel || !message) return;
     try {
-      const res = await axios.post("http://localhost:3000/api/hybrid/step", {
+      const res = await axios.post("https://arogyam-9rll.onrender.com/api/hybrid/step", {
         symptomLevel,
         message,
         feedbackScore

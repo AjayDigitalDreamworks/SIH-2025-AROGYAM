@@ -388,7 +388,7 @@ const Analytics = () => {
   const fetchAnalytics = async ()=>{
     try{
 
-      const res = await axios.get("http://localhost:3000/api/admin/analytics")
+      const res = await axios.get("https://arogyam-9rll.onrender.com/api/admin/analytics")
 
       setBranchData(res.data.branchData)
       setTrendData(res.data.trendData)

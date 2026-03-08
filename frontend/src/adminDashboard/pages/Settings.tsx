@@ -217,7 +217,7 @@ export default function Settings() {
       const token = localStorage.getItem("token")
 
       const res = await axios.get(
-        "http://localhost:3000/api/admin/profile",
+        "https://arogyam-9rll.onrender.com/api/admin/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -237,7 +237,7 @@ export default function Settings() {
       const token = localStorage.getItem("token")
 
       await axios.put(
-        "http://localhost:3000/api/admin/profile",
+        "https://arogyam-9rll.onrender.com/api/admin/profile",
         profile,
         {
           headers: {

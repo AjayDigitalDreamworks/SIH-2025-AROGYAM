@@ -340,12 +340,12 @@ const Index = () => {
 const fetchDashboardData = async () => {
   try {
 
-    const overviewRes = await axios.get("http://localhost:3000/api/admin/overview");
-    const trendRes = await axios.get("http://localhost:3000/api/admin/trends");
-    const riskRes = await axios.get("http://localhost:3000/api/admin/risk-students");
-    const counsellorRes = await axios.get("http://localhost:3000/api/admin/counsellors");
-    const peerRes = await axios.get("http://localhost:3000/api/admin/peer-topics");
-    const reportRes = await axios.get("http://localhost:3000/api/admin/reports");
+    const overviewRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/overview");
+    const trendRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/trends");
+    const riskRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/risk-students");
+    const counsellorRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/counsellors");
+    const peerRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/peer-topics");
+    const reportRes = await axios.get("https://arogyam-9rll.onrender.com/api/admin/reports");
 
     setOverview(overviewRes.data.data || {});
     setTrendData(trendRes.data.data || []);

@@ -151,7 +151,7 @@ fetchData()
 const fetchData = async ()=>{
 try{
 
-const res = await axios.get("http://localhost:3000/api/admin/peer-support")
+const res = await axios.get("https://arogyam-9rll.onrender.com/api/admin/peer-support")
 
 setStats(res.data.stats)
 setPeerMentors(res.data.peerMentors)

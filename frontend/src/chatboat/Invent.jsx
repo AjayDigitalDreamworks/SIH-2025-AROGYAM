@@ -13,7 +13,7 @@ function chatInvent() {
     if (!symptom || !message) return;
 
     try {
-      const res = await axios.post("http://localhost:3000/api/intervention", {
+      const res = await axios.post("https://arogyam-9rll.onrender.com/api/intervention", {
         symptom,
         message,
         feedback: rating !== 0 && response ? { module: response.selectedModule.name, rating } : null
@@ -33,7 +33,7 @@ function chatInvent() {
     if (!response || rating === 0) return;
 
     try {
-      await axios.post("http://localhost:3000/api/intervention", {
+      await axios.post("https://arogyam-9rll.onrender.com/api/intervention", {
         symptom: response.symptom,
         message: "Feedback update",
         feedback: { module: response.selectedModule.name, rating }
