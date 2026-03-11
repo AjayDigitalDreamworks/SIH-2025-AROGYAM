@@ -453,7 +453,7 @@ async function seedDatabase() {
         role: "student",
       }))
     );
-    // const students = await User.insertMany(studentDocs);
+    const students = await User.insertMany(studentDocs);
 
     const mentorDocs = await Promise.all(
       mentorSeed.map(async (seed) => ({

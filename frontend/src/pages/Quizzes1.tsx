@@ -17,17 +17,17 @@ import {
   Target,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import api from "@/config/api";
 
 // Function to send quiz score to backend
 const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
   try {
-    await axios.post("https://arogyam-9rll.onrender.com/api/quiz", {
+    await api.post("/api/quiz", {
       userId,
       score,
       quiz_type,
       date
-    }, { withCredentials: true });
+    });
     console.log("Quiz score submitted!");
   } catch (error) {
     console.error("Error submitting quiz score:", error);
@@ -150,8 +150,8 @@ export default function Quizzes() {
   };
     const [user, setUser] = useState(null);
  useEffect(() => {
-    axios
-      .get("https://arogyam-9rll.onrender.com/current_user", { withCredentials: true })
+    api
+      .get("/current_user")
       .then((response) => {
         console.log("Fetched user:", response.data.user);
         setUser(response.data.user);
@@ -180,12 +180,12 @@ export default function Quizzes() {
       const quizType = activeQuiz.id === "phq9" ? "depression" : "anxiety";
       const sendQuizScore = async (userId: string, score: number, quiz_type: string, date: Date = new Date()) => {
   try {
-    await axios.post("https://arogyam-9rll.onrender.com/api/quiz", {
+    await api.post("/api/quiz", {
       userId,
       score,
       quiz_type,
       date
-    } , {withCredentials:true});
+    });
     // Optionally show a toast or update state
     console.log("Quiz score submitted!");
   } catch (error) {

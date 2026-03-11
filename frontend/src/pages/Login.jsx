@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from "@/config/api";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -15,17 +16,10 @@ const LoginForm = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const response = await api.post("/api/auth/login", { email, password });
+            const result = response.data;
 
-            const result = await response.json();
-
-            if (response.ok && result.token) {
+            if (result?.token) {
                 const token = result.token;
                 console.log("Login successful, token:", token);
                 localStorage.setItem('token', token);

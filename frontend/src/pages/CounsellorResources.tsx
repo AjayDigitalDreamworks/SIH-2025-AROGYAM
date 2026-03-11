@@ -26,6 +26,10 @@ import { useToast } from "@/hooks/use-toast";
 // Set your actual Cloudinary cloud name below
 import api from "@/config/api";
 const cloudinaryBase = "https://res.cloudinary.com/dlpyvzfis/video/upload/";
+const backendOrigin =
+  typeof window !== "undefined"
+    ? new URL((api.defaults.baseURL as string) || window.location.origin).origin
+    : "";
 
 export default function CounsellorResources() {
   const { toast } = useToast();
@@ -79,7 +83,7 @@ export default function CounsellorResources() {
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       // Only accept messages from the backend origin for security
-      if (e.origin !== 'https://arogyam-9rll.onrender.com') return;
+      if (backendOrigin && e.origin !== backendOrigin) return;
       const data = e.data || {};
       if (data.type === 'upload-success') {
         toast({ title: 'Upload successful', description: data.message || 'Resource uploaded' });
@@ -127,8 +131,7 @@ export default function CounsellorResources() {
   }, [toast]);
 
   const handleUploadClick = () => {
-    // Open the backend upload form in the same tab
-    window.location.href = 'https://arogyam-9rll.onrender.com/videos/upload';
+    window.location.href = `${backendOrigin}/videos/upload`;
   };
 
   // NOTE: file input upload flow removed. Backend upload form will be used instead.

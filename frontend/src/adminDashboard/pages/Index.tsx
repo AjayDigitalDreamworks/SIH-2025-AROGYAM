@@ -308,59 +308,106 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "@/config/api";
 
+type OverviewData = {
+  totalStudents: number;
+  atRisk: number;
+  low: number;
+  moderate: number;
+  high: number;
+  avgScore: number;
+};
+
+type TrendPoint = {
+  week: string;
+  score: number;
+};
+
+type RiskStudent = {
+  id: string;
+  date: string;
+  level: string;
+};
+
+type CounsellorSummary = {
+  name: string;
+  sessions: number;
+};
+
+type PeerTopic = {
+  topic: string;
+  count: number;
+};
+
+type ReportsData = {
+  aiInteractions: number;
+  crisisAlerts: number;
+  emergencyCases: number;
+};
+
+const emptyOverview: OverviewData = {
+  totalStudents: 0,
+  atRisk: 0,
+  low: 0,
+  moderate: 0,
+  high: 0,
+  avgScore: 0,
+};
+
+const emptyReports: ReportsData = {
+  aiInteractions: 0,
+  crisisAlerts: 0,
+  emergencyCases: 0,
+};
+
 const Index = () => {
+  const [overview, setOverview] = useState<OverviewData>(emptyOverview);
+  const [trendData, setTrendData] = useState<TrendPoint[]>([]);
+  const [riskStudents, setRiskStudents] = useState<RiskStudent[]>([]);
+  const [counsellors, setCounsellors] = useState<CounsellorSummary[]>([]);
+  const [peerTopics, setPeerTopics] = useState<PeerTopic[]>([]);
+  const [reports, setReports] = useState<ReportsData>(emptyReports);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [overview, setOverview] = useState({
-    totalStudents: 0,
-    atRisk: 0,
-    low: 0,
-    moderate: 0,
-    high: 0,
-    avgScore: 0
-  });
-
-  const [trendData, setTrendData] = useState([]);
-  const [riskStudents, setRiskStudents] = useState([]);
-  const [counsellors, setCounsellors] = useState([]);
-  const [peerTopics, setPeerTopics] = useState([]);
-
-  const [reports, setReports] = useState({
-    aiInteractions: 0,
-    crisisAlerts: 0,
-    emergencyCases: 0
-  });
-
-  const peerPostsToday = peerTopics.reduce((sum, topic) => sum + (topic.count || 0), 0);
+  const peerPostsToday = useMemo(
+    () => peerTopics.reduce((sum, topic) => sum + (topic.count || 0), 0),
+    [peerTopics],
+  );
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-const fetchDashboardData = async () => {
-  try {
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    const overviewRes = await api.get("/api/admin/overview");
-    console.log("Overview response:", overviewRes);
-    const trendRes = await api.get("/api/admin/trends");
-    const riskRes = await api.get("/api/admin/risk-students");
-    const counsellorRes = await api.get("/api/admin/counsellors");
-    const peerRes = await api.get("/api/admin/peer-topics");
-    const reportRes = await api.get("/api/admin/reports");
+      const [overviewRes, trendRes, riskRes, counsellorRes, peerRes, reportRes] = await Promise.all([
+        api.get("/api/admin/overview"),
+        api.get("/api/admin/trends"),
+        api.get("/api/admin/risk-students"),
+        api.get("/api/admin/counsellors"),
+        api.get("/api/admin/peer-topics"),
+        api.get("/api/admin/reports"),
+      ]);
 
-    setOverview(overviewRes.data.data || {});
-    setTrendData(trendRes.data.data || []);
-    setRiskStudents(riskRes.data.data || []);
-    setCounsellors(counsellorRes.data.data || []);
-    setPeerTopics(peerRes.data.data || []);
-    setReports(reportRes.data.data || {});
-
-  } catch (error) {
-    console.error("Dashboard fetch error:", error);
-  }
-};
+      setOverview(overviewRes.data?.data || emptyOverview);
+      setTrendData(Array.isArray(trendRes.data?.data) ? trendRes.data.data : []);
+      setRiskStudents(Array.isArray(riskRes.data?.data) ? riskRes.data.data : []);
+      setCounsellors(Array.isArray(counsellorRes.data?.data) ? counsellorRes.data.data : []);
+      setPeerTopics(Array.isArray(peerRes.data?.data) ? peerRes.data.data : []);
+      setReports(reportRes.data?.data || emptyReports);
+    } catch (fetchError) {
+      console.error("Dashboard fetch error:", fetchError);
+      setError("Unable to load admin dashboard data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -369,15 +416,21 @@ const fetchDashboardData = async () => {
         subtitle="Empowering student wellbeing through data insights."
       />
 
-      <div className="grid grid-cols-12 gap-4">
+      <TipBanner message="Live admin insights update directly from student, counselling and community activity." />
+
+      {error && (
+        <p className="mb-3 text-sm text-red-600">{error}</p>
+      )}
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
 
         {/* Campus Wellbeing Overview */}
-        <div className="col-span-8">
+        <div className="xl:col-span-8">
           <h2 className="text-lg font-bold text-foreground mb-3">
             Campus Wellbeing Overview
           </h2>
 
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
 
             {/* Total Students */}
             <div className="stat-card">
@@ -430,7 +483,7 @@ const fetchDashboardData = async () => {
         </div>
 
         {/* Average Wellbeing Score */}
-        <div className="col-span-4">
+        <div className="xl:col-span-4">
           <div className="glass-card-strong rounded-2xl p-4 flex items-center gap-4 h-full">
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-muted-foreground mb-1">
@@ -447,13 +500,13 @@ const fetchDashboardData = async () => {
             <img
               src={studentHero}
               alt="Student"
-              className="w-28 h-28 object-contain"
+              className="w-20 h-20 sm:w-28 sm:h-28 object-contain"
             />
           </div>
         </div>
 
         {/* Mental Health Trends */}
-        <div className="col-span-8">
+        <div className="xl:col-span-8">
           <h2 className="text-lg font-bold text-foreground mb-3">
             Mental Health Trends
           </h2>
@@ -488,84 +541,90 @@ const fetchDashboardData = async () => {
         </div>
 
         {/* Counsellors */}
-        <div className="col-span-4">
+        <div className="xl:col-span-4">
           <div className="glass-card-strong rounded-2xl p-4 mb-4">
             <h3 className="text-sm font-bold text-foreground mb-3">
               Counselling Center
             </h3>
 
             <div className="space-y-3">
-              {counsellors.map((c) => (
+              {counsellors.map((counsellor) => (
                 <div
-                  key={c.name}
+                  key={counsellor.name}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
                     <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${c.name}`}
-                      alt={c.name}
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${counsellor.name}`}
+                      alt={counsellor.name}
                       className="w-8 h-8 rounded-full bg-accent"
                     />
                     <span className="text-sm font-medium text-foreground">
-                      {c.name}
+                      {counsellor.name}
                     </span>
                   </div>
 
                   <span className="text-sm text-muted-foreground font-semibold">
-                    {c.sessions} Sessions
+                    {counsellor.sessions} Sessions
                   </span>
                 </div>
               ))}
+              {!loading && counsellors.length === 0 && (
+                <p className="text-xs text-muted-foreground">No counsellor data available.</p>
+              )}
             </div>
           </div>
         </div>
 
         {/* Early Risk Detection */}
-        <div className="col-span-8">
+        <div className="xl:col-span-8">
           <div className="glass-card rounded-2xl p-4">
             <h3 className="text-lg font-bold text-foreground mb-3">
               Early Risk Detection
             </h3>
 
             <div className="space-y-2">
-              {riskStudents.map((s) => (
+              {riskStudents.map((student) => (
                 <div
-                  key={s.id}
-                  className="flex items-center justify-between bg-white/50 rounded-xl px-4 py-3"
+                  key={student.id}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-white/50 rounded-xl px-4 py-3"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${s.id}`}
-                      alt={s.id}
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${student.id}`}
+                      alt={student.id}
                       className="w-8 h-8 rounded-full bg-accent"
                     />
 
                     <span className="text-sm font-semibold text-foreground">
-                      {s.id}
+                      {student.id}
                     </span>
 
-                    <span className="text-xs text-muted-foreground">
-                      {s.date}
+                    <span className="text-xs text-muted-foreground truncate">
+                      {student.date}
                     </span>
                   </div>
 
                   <span
                     className={
-                      s.level === "High"
+                      student.level === "High"
                         ? "risk-badge-high"
                         : "risk-badge-moderate"
                     }
                   >
-                    {s.level}
+                    {student.level}
                   </span>
                 </div>
               ))}
+              {!loading && riskStudents.length === 0 && (
+                <p className="text-xs text-muted-foreground">No risk records available.</p>
+              )}
             </div>
           </div>
         </div>
 
           {/* Peer Support */}
-        <div className="col-span-4">
+        <div className="xl:col-span-4">
           <div className="glass-card-strong rounded-2xl p-4">
             <h3 className="text-sm font-bold text-foreground mb-3">Peer Support</h3>
             <div className="flex items-center gap-2 mb-4">
@@ -574,18 +633,21 @@ const fetchDashboardData = async () => {
               <span className="text-xs text-muted-foreground">Posts Today</span>
             </div>
             <div className="space-y-2">
-              {peerTopics.map((t) => (
+              {peerTopics.map((topic) => (
                 <div
-                  key={t.topic}
+                  key={topic.topic}
                   className="flex items-center justify-between bg-white/50 rounded-lg px-3 py-2"
                 >
-                  <span className="text-sm text-foreground">{t.topic}</span>
+                  <span className="text-sm text-foreground">{topic.topic}</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold text-foreground">{t.count}</span>
+                    <span className="text-sm font-bold text-foreground">{topic.count}</span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
               ))}
+              {!loading && peerTopics.length === 0 && (
+                <p className="text-xs text-muted-foreground">No peer topic activity yet.</p>
+              )}
             </div>
             <button className="w-full mt-4 bg-primary/10 text-primary rounded-xl py-2 text-sm font-semibold hover:bg-primary/20 transition-colors">
               View Posts
@@ -594,12 +656,12 @@ const fetchDashboardData = async () => {
         </div>
 
         {/* Reports */}
-        <div className="col-span-12">
+        <div className="xl:col-span-12">
           <h3 className="text-lg font-bold text-foreground mt-4 mb-3">
             Reports
           </h3>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
             <div className="stat-card flex items-center gap-3">
               <Bot className="w-8 h-8 text-primary" />

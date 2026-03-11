@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Mic, MicOff } from "lucide-react";
+import api from "@/config/api";
 
 export default function Chat() {
     // Chat memory in localStorage
@@ -74,12 +75,8 @@ export default function Chat() {
         try {
             const sessionId = localStorage.getItem("sessionId") || crypto.randomUUID();
             localStorage.setItem("sessionId", sessionId);
-            const response = await fetch("https://arogyam-9rll.onrender.com/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userText, sessionId }),
-            });
-            const data = await response.json();
+            const response = await api.post("/api/chat", { message: userText, sessionId });
+            const data = response.data;
             const botReply = {
                 sender: "bot",
                 text: data.reply,

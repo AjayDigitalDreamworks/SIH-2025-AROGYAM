@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "@/config/api";
 
 /* ─────────────────────────────────────────────
    LOTUS LOGO  – wide multi-petal blue lotus
@@ -224,6 +225,7 @@ const CloudBg = () => (
 const LoginForm = () => {
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
+  const [errorMessage,setErrorMessage]=useState("");
   const [showPass,setShowPass]=useState(false);
   const [remember,setRemember]=useState(true);
   const [loading,setLoading]=useState(false);
@@ -241,17 +243,12 @@ const LoginForm = () => {
         }
 
         try {
-            const response = await fetch('https://arogyam-9rll.onrender.com/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            setLoading(true);
+            setErrorMessage("");
+            const response = await api.post("/api/auth/login", { email, password });
+            const result = response.data;
 
-            const result = await response.json();
-
-            if (response.ok && result.token) {
+            if (result?.token) {
                 const token = result.token;
                 console.log("Login successful, token:", token);
                 localStorage.setItem('token', token);
@@ -261,7 +258,9 @@ const LoginForm = () => {
             }
         } catch (error) {
             console.error("Error logging in:", error);
-            alert("An error occurred. Please try again later.");
+            setErrorMessage(error?.response?.data?.message || "An error occurred. Please try again later.");
+        } finally {
+          setLoading(false);
         }
     };
 
@@ -290,6 +289,11 @@ const LoginForm = () => {
       <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:"0.88rem",color:"#8AAAC8",margin:"0 0 1.8rem"}}>
         Sign in to continue to Arogyam
       </p>
+      {errorMessage && (
+        <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:"0.84rem",color:"#dc2626",margin:"0 0 1rem"}}>
+          {errorMessage}
+        </p>
+      )}
 
 <form onSubmit={handleSubmit} >
 
@@ -342,7 +346,7 @@ const LoginForm = () => {
       </div>
 
       {/* Sign In button */}
-      <button onClick={()=>{setLoading(true);setTimeout(()=>setLoading(false),1800);}} style={{
+      <button type="submit" disabled={loading} style={{
         width:"100%",padding:"0.85rem",
         background:"linear-gradient(135deg,#6BA5D8 0%,#5592C8 45%,#4480B8 100%)",
         border:"none",borderRadius:"13px",color:"white",

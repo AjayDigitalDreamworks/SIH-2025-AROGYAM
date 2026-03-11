@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 function Hybrid() {
   const [symptomLevel, setSymptomLevel] = useState("");
@@ -10,7 +10,7 @@ function Hybrid() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get("https://arogyam-9rll.onrender.com/api/hybrid/history");
+      const res = await api.get("/api/hybrid/history");
       setHistory(res.data);
     } catch (err) {
       console.error(err);
@@ -24,7 +24,7 @@ function Hybrid() {
   const handleSubmit = async () => {
     if (!symptomLevel || !message) return;
     try {
-      const res = await axios.post("https://arogyam-9rll.onrender.com/api/hybrid/step", {
+      const res = await api.post("/api/hybrid/step", {
         symptomLevel,
         message,
         feedbackScore

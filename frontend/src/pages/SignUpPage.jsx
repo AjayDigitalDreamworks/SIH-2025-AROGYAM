@@ -279,7 +279,7 @@ const SignUpForm = () => {
 
 try {
     const response = await axios.post(
-        'https://arogyam-9rll.onrender.com/api/auth/signup',
+        '/api/auth/signup',
         formData,
         {
             headers: {

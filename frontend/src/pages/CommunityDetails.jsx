@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+﻿import React, { useEffect, useState } from "react";
+import api from "@/config/api";
 import { useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function CommunityDetail() {
   const { id } = useParams();
-  const token = localStorage.getItem("token");
   const { toast } = useToast();
 
   const [posts, setPosts] = useState([]);
@@ -26,19 +25,22 @@ export default function CommunityDetail() {
   /* ================= FETCH POSTS ================= */
   const fetchPosts = async () => {
     try {
-      const res = await axios.get(
-        `https://arogyam-9rll.onrender.com/api/community/${id}/posts`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.get(`/api/community/${id}/posts`);
       setPosts(res.data);
     } catch (err) {
       console.error(err);
+      toast({
+        title: "Could not load posts",
+        description: "Please refresh and try again.",
+        variant: "destructive",
+      });
     }
   };
 
   useEffect(() => {
+    if (!id) return;
     fetchPosts();
-  }, []);
+  }, [id]);
 
   /* ================= CREATE POST ================= */
   const createPost = async () => {
@@ -51,10 +53,9 @@ export default function CommunityDetail() {
       return;
     }
 
-    await axios.post(
-      `https://arogyam-9rll.onrender.com/api/community/${id}/posts`,
+    await api.post(
+      `/api/community/${id}/posts`,
       { title, content },
-      { headers: { Authorization: `Bearer ${token}` } }
     );
 
     setTitle("");
@@ -65,11 +66,7 @@ export default function CommunityDetail() {
 
   /* ================= LIKE ================= */
   const likePost = async (postId) => {
-    await axios.post(
-      `https://arogyam-9rll.onrender.com/api/community/${postId}/like`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.post(`/api/community/${postId}/like`, {});
     fetchPosts();
   };
 
@@ -77,11 +74,7 @@ export default function CommunityDetail() {
   const submitReply = async (postId) => {
     if (!replyText.trim()) return;
 
-    await axios.post(
-      `https://arogyam-9rll.onrender.com/api/community/${postId}/reply`,
-      { content: replyText },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.post(`/api/community/${postId}/reply`, { content: replyText });
 
     setReplyText("");
     setActiveReplyPost(null);
@@ -100,9 +93,9 @@ export default function CommunityDetail() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
+    <div className="container mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-8">
       {/* HEADER */}
-      <div className="flex justify-between mb-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-bold">Community Discussion</h1>
         <Button onClick={() => setShowNewPost(!showNewPost)}>
           {showNewPost ? "Cancel" : "New Post"}
@@ -132,11 +125,11 @@ export default function CommunityDetail() {
       {/* POSTS */}
       <div className="space-y-4">
         {posts.map((post) => (
-          <Card key={post._id} className="p-6">
+          <Card key={post._id} className="p-4 sm:p-6">
             <div className="flex gap-4">
               <Avatar>
                 <AvatarFallback>
-                  {post.author?.fullName?.[0] || "👤"}
+                  {post.author?.fullName?.[0] || "U"}
                 </AvatarFallback>
               </Avatar>
 
@@ -149,7 +142,7 @@ export default function CommunityDetail() {
                     {post.author?.fullName || "Unknown"}
                   </span>
                   <span className="text-muted-foreground">
-                    • {new Date(post.createdAt).toLocaleString()}
+                    - {new Date(post.createdAt).toLocaleString()}
                   </span>
                 </div>
 
@@ -166,7 +159,7 @@ export default function CommunityDetail() {
                     className="flex items-center gap-1 hover:text-primary"
                   >
                     <ThumbsUp className="w-4 h-4" />
-                    {post.likes.length}
+                    {post.likes?.length ?? 0}
                   </button>
 
                   <button
@@ -174,7 +167,7 @@ export default function CommunityDetail() {
                     className="flex items-center gap-1 hover:text-primary"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    {post.replies.length}
+                    {post.replies?.length ?? 0}
                   </button>
 
                   <button
@@ -205,7 +198,7 @@ export default function CommunityDetail() {
                 )}
 
                 {/* REPLIES */}
-                {post.replies.map((r) => (
+                {(post.replies || []).map((r) => (
                   <div key={r._id} className="ml-10 mt-3 text-sm">
                     <span className="font-medium">
                       {r.author?.fullName || "User"}

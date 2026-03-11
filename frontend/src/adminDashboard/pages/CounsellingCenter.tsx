@@ -1,514 +1,303 @@
-// import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
-// import { PageHeader } from "../componentsAdmin/PageHeader";
-// import { TipBanner } from "../componentsAdmin/TipBanner";
-// import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
-
-// const days = ["Mend", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sat"];
-
-// const appointments = [
-//   { time: "10:00AM", id: "STU-1768", counsellor: "Dr. Mehta", mode: "Offline", status: "Confirmed" },
-//   { time: "11:00AM", id: "STU-2174", counsellor: "Dr. Kumar", mode: "Offline", status: "Confirmed" },
-//   { time: "12:00PM", id: "STU-8321", counsellor: "Dr. Mehta", mode: "Offline", status: "Pending" },
-//   { time: "02:00PM", id: "STU-6245", counsellor: "STU-1288", mode: "Online", status: "Completed" },
-//   { time: "02:00PM", id: "STU-2189", counsellor: "Dr. Mehta", mode: "Online", status: "Pending" },
-//   { time: "03:00PM", id: "STU-9912", counsellor: "Dr. Mehta", mode: "Online", status: "Completed" },
-//   { time: "04:00PM", id: "STU-7641", counsellor: "STU-7641", mode: "ME", status: "Completed" },
-// ];
-
-// const counsellors = [
-//   { name: "Dr. Mehta", sessions: 12, tag: "Appointment" },
-//   { name: "Dr. Kumar", sessions: 10, tag: "Appointment" },
-//   { name: "Ms. Rao", sessions: 8, tag: "Sreahbloer" },
-// ];
-
-// const CounsellingCenter = () => {
-//   return (
-//     <DashboardLayout>
-//       <PageHeader
-//         title="Counselling Center"
-//         subtitle="Managing counselling appointments and counsellor availability."
-//       />
-
-//       <TipBanner message="Ensure a balanced counselling load for all counsellors." />
-
-//       {/* Filters */}
-//       <div className="glass-card rounded-2xl p-4 mb-4">
-//         <div className="flex flex-wrap items-center gap-3">
-//           <select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-//             <option>View Counsellors</option>
-//           </select>
-//           <select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-//             <option>Appointment Type</option>
-//           </select>
-//           <select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-//             <option>Preferred Time Slot</option>
-//           </select>
-//           <button className="bg-accent text-accent-foreground rounded-full px-6 py-2 text-sm font-semibold flex items-center gap-1">
-//             <Settings className="w-3 h-3" /> Apply Filters
-//           </button>
-//           <button className="ml-auto bg-primary text-primary-foreground rounded-full px-6 py-2 text-sm font-semibold">
-//             Manage Availability
-//           </button>
-//         </div>
-//       </div>
-
-//       <div className="grid grid-cols-12 gap-4">
-//         {/* Appointments */}
-//         <div className="col-span-8">
-//           <div className="glass-card rounded-2xl p-4 mb-4">
-//             <div className="flex items-center justify-between mb-3">
-//               <h3 className="text-lg font-bold text-foreground">Upcoming Appointments <span className="text-sm text-muted-foreground font-normal">(12 Total)</span></h3>
-//             </div>
-
-//             {/* Summary stats */}
-//             <div className="grid grid-cols-4 gap-3 mb-4">
-//               <div className="bg-blue-50 rounded-xl p-3 text-center">
-//                 <p className="text-2xl font-bold text-primary">580</p>
-//                 <p className="text-xs text-muted-foreground">Low Risk</p>
-//               </div>
-//               <div className="bg-orange-50 rounded-xl p-3 text-center">
-//                 <p className="text-2xl font-bold text-arogyam-orange">352</p>
-//                 <p className="text-xs text-muted-foreground">Moderate</p>
-//               </div>
-//               <div className="bg-accent rounded-xl p-3 text-center">
-//                 <p className="text-2xl font-bold text-foreground">42</p>
-//                 <p className="text-xs text-muted-foreground">CSCE</p>
-//               </div>
-//               <div className="bg-green-50 rounded-xl p-3 text-center">
-//                 <p className="text-2xl font-bold text-arogyam-green">92%</p>
-//                 <p className="text-xs text-muted-foreground">High Risk</p>
-//               </div>
-//             </div>
-
-//             {/* Day tabs */}
-//             <div className="flex gap-1 mb-4">
-//               {days.map((d, i) => (
-//                 <span
-//                   key={`${d}-${i}`}
-//                   className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-//                     i === 0
-//                       ? "bg-primary text-primary-foreground"
-//                       : "bg-white/50 text-muted-foreground hover:bg-accent"
-//                   }`}
-//                 >
-//                   {d}
-//                 </span>
-//               ))}
-//             </div>
-
-//             {/* Table */}
-//             <table className="w-full text-sm">
-//               <thead>
-//                 <tr className="text-muted-foreground text-xs border-b border-border">
-//                   <th className="text-left py-2 font-medium">Time</th>
-//                   <th className="text-left py-2 font-medium">Student ID</th>
-//                   <th className="text-left py-2 font-medium">Counsellor</th>
-//                   <th className="text-left py-2 font-medium">Mode</th>
-//                   <th className="text-left py-2 font-medium">Status</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {appointments.map((a, i) => (
-//                   <tr key={i} className="border-b border-border/50 hover:bg-white/30">
-//                     <td className="py-3 font-medium text-foreground">{a.time}</td>
-//                     <td className="flex items-center gap-2 py-3">
-//                       <img
-//                         src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${a.id}`}
-//                         alt={a.id}
-//                         className="w-7 h-7 rounded-full bg-accent"
-//                       />
-//                       {a.id}
-//                     </td>
-//                     <td className="text-muted-foreground">{a.counsellor}</td>
-//                     <td>
-//                       <span
-//                         className={`text-xs px-2 py-1 rounded-full font-medium ${
-//                           a.mode === "Online"
-//                             ? "bg-green-100 text-green-700"
-//                             : a.mode === "Offline"
-//                             ? "bg-blue-100 text-blue-700"
-//                             : "text-muted-foreground"
-//                         }`}
-//                       >
-//                         {a.mode}
-//                       </span>
-//                     </td>
-//                     <td>
-//                       <span
-//                         className={
-//                           a.status === "Confirmed"
-//                             ? "status-confirmed"
-//                             : a.status === "Pending"
-//                             ? "status-pending"
-//                             : "status-completed"
-//                         }
-//                       >
-//                         {a.status}
-//                       </span>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-
-//             <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-//               <div className="flex items-center gap-2">
-//                 <ChevronLeft className="w-4 h-4 cursor-pointer" />
-//                 <span>126</span>
-//                 <ChevronRight className="w-4 h-4 cursor-pointer" />
-//               </div>
-//               <span>1-6 of 1,140 students</span>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Counsellor Overview */}
-//         <div className="col-span-4 space-y-4">
-//           <div className="glass-card-strong rounded-2xl p-4">
-//             <h3 className="text-sm font-bold text-foreground mb-3">Counsellor Overview</h3>
-//             <div className="space-y-3">
-//               {counsellors.map((c) => (
-//                 <div key={c.name} className="flex items-center justify-between">
-//                   <div className="flex items-center gap-2">
-//                     <img
-//                       src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${c.name}`}
-//                       alt={c.name}
-//                       className="w-8 h-8 rounded-full bg-accent"
-//                     />
-//                     <div>
-//                       <p className="text-sm font-medium text-foreground">{c.name}</p>
-//                       <p className="text-xs text-muted-foreground">{c.sessions} sessions</p>
-//                     </div>
-//                   </div>
-//                   <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
-//                     {c.tag}
-//                   </span>
-//                 </div>
-//               ))}
-//             </div>
-//             <button className="w-full mt-4 bg-primary/10 text-primary rounded-xl py-2 text-sm font-semibold hover:bg-primary/20 transition-colors">
-//               Manage
-//             </button>
-//           </div>
-
-//           <div className="glass-card-strong rounded-2xl p-4">
-//             <h3 className="text-sm font-bold text-foreground mb-2">Counsellor Overview</h3>
-//             <div className="flex items-center gap-2 mb-3">
-//               <span className="text-3xl font-bold text-arogyam-green">92%</span>
-//               <span className="text-xs text-muted-foreground">Satisfaction Rate</span>
-//             </div>
-//             <p className="text-sm font-semibold text-foreground mb-2">+109 Sessions Booked</p>
-//             <button className="w-full bg-primary/10 text-primary rounded-xl py-2 text-sm font-semibold hover:bg-primary/20 transition-colors">
-//               Manage
-//             </button>
-//           </div>
-
-//           <div className="text-right">
-//             <button className="text-sm text-muted-foreground hover:text-foreground font-medium">
-//               See All Appointments <ChevronRight className="inline w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </DashboardLayout>
-//   );
-// };
-
-// export default CounsellingCenter;
-
-
+import { useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
 import { PageHeader } from "../componentsAdmin/PageHeader";
 import { TipBanner } from "../componentsAdmin/TipBanner";
-import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Settings } from "lucide-react";
 import api from "@/config/api";
 
-const days = ["Mend", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sat"];
+type AppointmentRow = {
+  date?: string;
+  time: string;
+  id: string;
+  counsellor: string;
+  mode: string;
+  status: string;
+};
+
+type CounsellorRow = {
+  name: string;
+  sessions: number;
+  tag: string;
+};
+
+type Stats = {
+  lowRisk: number;
+  moderate: number;
+  csce: number;
+  counsellorsCount?: number;
+  highRisk: number;
+};
+
+const emptyStats: Stats = {
+  lowRisk: 0,
+  moderate: 0,
+  csce: 0,
+  counsellorsCount: 0,
+  highRisk: 0,
+};
+
+const formatDateLabel = (value?: string) => {
+  if (!value) return "No date";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "No date";
+  return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+};
 
 const CounsellingCenter = () => {
-
-const [appointments,setAppointments] = useState<any[]>([])
-const [counsellors,setCounsellors] = useState<any[]>([])
-const [stats,setStats] = useState<any>({
-lowRisk:0,
-moderate:0,
-csce:0,
-highRisk:0
-})
-
-useEffect(()=>{
-fetchData()
-},[])
-
-const fetchData = async ()=>{
-try{
-
-const res = await api.get("/api/admin/counselling")
-
-setAppointments(res.data.appointments)
-setCounsellors(res.data.counsellors)
-setStats(res.data.stats)
-
-}catch(err){
-console.log(err)
-}
-}
-
-return (
-<DashboardLayout>
-
-<PageHeader
-title="Counselling Center"
-subtitle="Managing counselling appointments and counsellor availability."
-/>
-
-<TipBanner message="Ensure a balanced counselling load for all counsellors." />
-
-{/* Filters */}
-
-<div className="glass-card rounded-2xl p-4 mb-4">
-
-<div className="flex flex-wrap items-center gap-3">
-
-<select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-<option>View Counsellors</option>
-</select>
-
-<select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-<option>Appointment Type</option>
-</select>
-
-<select className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm">
-<option>Preferred Time Slot</option>
-</select>
-
-<button className="bg-accent text-accent-foreground rounded-full px-6 py-2 text-sm font-semibold flex items-center gap-1">
-<Settings className="w-3 h-3" /> Apply Filters
-</button>
-
-<button className="ml-auto bg-primary text-primary-foreground rounded-full px-6 py-2 text-sm font-semibold">
-Manage Availability
-</button>
-
-</div>
-</div>
-
-<div className="grid grid-cols-12 gap-4">
-
-{/* Appointments */}
-
-<div className="col-span-8">
-
-<div className="glass-card rounded-2xl p-4 mb-4">
-
-<div className="flex items-center justify-between mb-3">
-
-<h3 className="text-lg font-bold text-foreground">
-Upcoming Appointments
-<span className="text-sm text-muted-foreground font-normal">({appointments.length} Total)</span>
-</h3>
-
-</div>
-
-{/* Stats */}
-
-<div className="grid grid-cols-4 gap-3 mb-4">
-
-<div className="bg-blue-50 rounded-xl p-3 text-center">
-<p className="text-2xl font-bold text-primary">{stats.lowRisk}</p>
-<p className="text-xs text-muted-foreground">Low Risk</p>
-</div>
-
-<div className="bg-orange-50 rounded-xl p-3 text-center">
-<p className="text-2xl font-bold text-arogyam-orange">{stats.moderate}</p>
-<p className="text-xs text-muted-foreground">Moderate</p>
-</div>
-
-<div className="bg-accent rounded-xl p-3 text-center">
-<p className="text-2xl font-bold text-foreground">{stats.csce}</p>
-<p className="text-xs text-muted-foreground">CSCE</p>
-</div>
-
-<div className="bg-green-50 rounded-xl p-3 text-center">
-<p className="text-2xl font-bold text-arogyam-green">{stats.highRisk}%</p>
-<p className="text-xs text-muted-foreground">High Risk</p>
-</div>
-
-</div>
-
-{/* Days */}
-
-<div className="flex gap-1 mb-4">
-
-{days.map((d,i)=>(
-<span
-key={`${d}-${i}`}
-className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
-i===0
-? "bg-primary text-primary-foreground"
-: "bg-white/50 text-muted-foreground hover:bg-accent"
-}`}
->
-{d}
-</span>
-))}
-
-</div>
-
-{/* Table */}
-
-<table className="w-full text-sm">
-
-<thead>
-
-<tr className="text-muted-foreground text-xs border-b border-border">
-
-<th className="text-left py-2 font-medium">Time</th>
-<th className="text-left py-2 font-medium">Student ID</th>
-<th className="text-left py-2 font-medium">Counsellor</th>
-<th className="text-left py-2 font-medium">Mode</th>
-<th className="text-left py-2 font-medium">Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{appointments.map((a,i)=>(
-<tr key={i} className="border-b border-border/50 hover:bg-white/30">
-
-<td className="py-3 font-medium text-foreground">{a.time}</td>
-
-<td className="flex items-center gap-2 py-3">
-
-<img
-src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${a.id}`}
-alt={a.id}
-className="w-7 h-7 rounded-full bg-accent"
-/>
-
-{a.id}
-
-</td>
-
-<td className="text-muted-foreground">{a.counsellor}</td>
-
-<td>
-
-<span className={`text-xs px-2 py-1 rounded-full font-medium ${
-a.mode==="Online"
-? "bg-green-100 text-green-700"
-: a.mode==="Offline"
-? "bg-blue-100 text-blue-700"
-: "text-muted-foreground"
-}`}>
-
-{a.mode}
-
-</span>
-
-</td>
-
-<td>
-
-<span className={
-a.status==="Confirmed"
-? "status-confirmed"
-: a.status==="Pending"
-? "status-pending"
-: "status-completed"
-}>
-{a.status}
-</span>
-
-</td>
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-<div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-
-<div className="flex items-center gap-2">
-
-<ChevronLeft className="w-4 h-4 cursor-pointer"/>
-<span>126</span>
-<ChevronRight className="w-4 h-4 cursor-pointer"/>
-
-</div>
-
-<span>1-6 of 1,140 students</span>
-
-</div>
-
-</div>
-
-</div>
-
-{/* Counsellor Overview */}
-
-<div className="col-span-4 space-y-4">
-
-<div className="glass-card-strong rounded-2xl p-4">
-
-<h3 className="text-sm font-bold text-foreground mb-3">
-Counsellor Overview
-</h3>
-
-<div className="space-y-3">
-
-{counsellors.map((c)=>(
-<div key={c.name} className="flex items-center justify-between">
-
-<div className="flex items-center gap-2">
-
-<img
-src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${c.name}`}
-alt={c.name}
-className="w-8 h-8 rounded-full bg-accent"
-/>
-
-<div>
-
-<p className="text-sm font-medium text-foreground">
-{c.name}
-</p>
-
-<p className="text-xs text-muted-foreground">
-{c.sessions} sessions
-</p>
-
-</div>
-
-</div>
-
-<span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
-{c.tag}
-</span>
-
-</div>
-))}
-
-</div>
-
-<button className="w-full mt-4 bg-primary/10 text-primary rounded-xl py-2 text-sm font-semibold hover:bg-primary/20 transition-colors">
-Manage
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-</DashboardLayout>
-)
-
-}
-
-export default CounsellingCenter
+  const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
+  const [counsellors, setCounsellors] = useState<CounsellorRow[]>([]);
+  const [stats, setStats] = useState<Stats>(emptyStats);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [selectedMode, setSelectedMode] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [selectedDate, setSelectedDate] = useState("All");
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await api.get("/api/admin/counselling");
+
+      setAppointments(Array.isArray(res.data?.appointments) ? res.data.appointments : []);
+      setCounsellors(Array.isArray(res.data?.counsellors) ? res.data.counsellors : []);
+      setStats(res.data?.stats || emptyStats);
+    } catch (fetchError) {
+      console.error(fetchError);
+      setError("Unable to load counselling center data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dateOptions = useMemo(() => {
+    const set = new Set(
+      appointments
+        .map((appointment) => appointment.date)
+        .filter((value): value is string => Boolean(value)),
+    );
+    return ["All", ...Array.from(set)];
+  }, [appointments]);
+
+  const filteredAppointments = useMemo(() => {
+    return appointments.filter((appointment) => {
+      if (selectedDate !== "All" && appointment.date !== selectedDate) return false;
+      if (selectedMode !== "All" && appointment.mode !== selectedMode) return false;
+      if (selectedStatus !== "All" && appointment.status !== selectedStatus) return false;
+      return true;
+    });
+  }, [appointments, selectedDate, selectedMode, selectedStatus]);
+
+  const statusOptions = useMemo(() => {
+    return ["All", ...Array.from(new Set(appointments.map((appointment) => appointment.status).filter(Boolean)))];
+  }, [appointments]);
+
+  const modeOptions = useMemo(() => {
+    return ["All", ...Array.from(new Set(appointments.map((appointment) => appointment.mode).filter(Boolean)))];
+  }, [appointments]);
+
+  const totalCounsellors = stats.counsellorsCount ?? stats.csce;
+
+  return (
+    <DashboardLayout>
+      <PageHeader
+        title="Counselling Center"
+        subtitle="Managing counselling appointments and counsellor availability."
+      />
+
+      <TipBanner message="Keep counsellor load balanced by tracking mode, status and day-wise appointments." />
+
+      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+
+      <div className="glass-card rounded-2xl p-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <select
+            value={selectedDate}
+            onChange={(event) => setSelectedDate(event.target.value)}
+            className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm"
+          >
+            {dateOptions.map((dateValue) => (
+              <option key={dateValue} value={dateValue}>
+                {dateValue === "All" ? "All Days" : formatDateLabel(dateValue)}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedMode}
+            onChange={(event) => setSelectedMode(event.target.value)}
+            className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm"
+          >
+            {modeOptions.map((mode) => (
+              <option key={mode} value={mode}>
+                {mode === "All" ? "All Modes" : mode}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(event) => setSelectedStatus(event.target.value)}
+            className="bg-white/70 border border-white/50 rounded-full px-4 py-2 text-sm"
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status === "All" ? "All Statuses" : status}
+              </option>
+            ))}
+          </select>
+
+          <button className="bg-accent text-accent-foreground rounded-full px-6 py-2 text-sm font-semibold flex items-center justify-center gap-1">
+            <Settings className="w-3 h-3" /> Manage Availability
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <div className="xl:col-span-8">
+          <div className="glass-card rounded-2xl p-4 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-foreground">
+                Upcoming Appointments
+                <span className="text-sm text-muted-foreground font-normal">
+                  {" "}({filteredAppointments.length} shown)
+                </span>
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+              <div className="bg-blue-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-primary">{stats.lowRisk}</p>
+                <p className="text-xs text-muted-foreground">Low Risk</p>
+              </div>
+
+              <div className="bg-orange-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-arogyam-orange">{stats.moderate}</p>
+                <p className="text-xs text-muted-foreground">Moderate</p>
+              </div>
+
+              <div className="bg-accent rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-foreground">{totalCounsellors}</p>
+                <p className="text-xs text-muted-foreground">Counsellors</p>
+              </div>
+
+              <div className="bg-green-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-arogyam-green">{stats.highRisk}%</p>
+                <p className="text-xs text-muted-foreground">High Risk</p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-sm">
+                <thead>
+                  <tr className="text-muted-foreground text-xs border-b border-border">
+                    <th className="text-left py-2 font-medium">Date</th>
+                    <th className="text-left py-2 font-medium">Time</th>
+                    <th className="text-left py-2 font-medium">Student ID</th>
+                    <th className="text-left py-2 font-medium">Counsellor</th>
+                    <th className="text-left py-2 font-medium">Mode</th>
+                    <th className="text-left py-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredAppointments.map((appointment) => (
+                    <tr key={`${appointment.id}-${appointment.time}`} className="border-b border-border/50 hover:bg-white/30">
+                      <td className="py-3 text-muted-foreground">{formatDateLabel(appointment.date)}</td>
+                      <td className="py-3 font-medium text-foreground">{appointment.time}</td>
+
+                      <td className="flex items-center gap-2 py-3">
+                        <img
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${appointment.id}`}
+                          alt={appointment.id}
+                          className="w-7 h-7 rounded-full bg-accent"
+                        />
+                        {appointment.id}
+                      </td>
+
+                      <td className="text-muted-foreground">{appointment.counsellor}</td>
+
+                      <td>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            appointment.mode === "Online"
+                              ? "bg-green-100 text-green-700"
+                              : appointment.mode === "Offline"
+                                ? "bg-blue-100 text-blue-700"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {appointment.mode}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            appointment.status === "Confirmed"
+                              ? "status-confirmed"
+                              : appointment.status === "Pending"
+                                ? "status-pending"
+                                : "status-completed"
+                          }
+                        >
+                          {appointment.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {!loading && filteredAppointments.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="py-4 text-center text-muted-foreground">
+                        No appointments match current filters.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="xl:col-span-4 space-y-4">
+          <div className="glass-card-strong rounded-2xl p-4">
+            <h3 className="text-sm font-bold text-foreground mb-3">Counsellor Overview</h3>
+
+            <div className="space-y-3">
+              {counsellors.map((counsellor) => (
+                <div key={counsellor.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${counsellor.name}`}
+                      alt={counsellor.name}
+                      className="w-8 h-8 rounded-full bg-accent"
+                    />
+
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{counsellor.name}</p>
+                      <p className="text-xs text-muted-foreground">{counsellor.sessions} sessions</p>
+                    </div>
+                  </div>
+
+                  <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
+                    {counsellor.tag}
+                  </span>
+                </div>
+              ))}
+              {!loading && counsellors.length === 0 && (
+                <p className="text-xs text-muted-foreground">No counsellor records available.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default CounsellingCenter;

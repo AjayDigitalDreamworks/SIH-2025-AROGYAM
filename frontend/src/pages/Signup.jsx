@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+﻿import React, { useState } from 'react';
+import api from '@/config/api';
 
 const SignUpForm = () => {
     const [formData, setFormData] = useState({
@@ -8,7 +8,7 @@ const SignUpForm = () => {
         email: '',
         phone: '',
         password: '',
-        avatar: '🎓',
+        avatar: 'Student',
         university: '',
         yearOfStudy: ''
     });
@@ -36,8 +36,8 @@ const SignUpForm = () => {
         console.log('Submitting signup form with data:', formData)
 
 try {
-    const response = await axios.post(
-        'http://localhost:3000/api/auth/signup',
+    const response = await api.post(
+        '/api/auth/signup',
         formData,
         {
             headers: {
@@ -191,10 +191,10 @@ try {
                             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select</option>
-                            <option value="Freshman">1st year</option>
-                            <option value="Sophomore">2nd year</option>
-                            <option value="Junior">3rd year</option>
-                            <option value="Senior">4th year</option>
+                            <option value="1">1st year</option>
+                            <option value="2">2nd year</option>
+                            <option value="3">3rd year</option>
+                            <option value="4">4th year</option>
                            
                         </select>
                     </div>

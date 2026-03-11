@@ -580,6 +580,7 @@ router.get("/counselling", verifyToken, ensureAdmin, async (_req, res) => {
     const total = students.length || 1;
 
     const appointmentsData = appointments.map((appointment) => ({
+      date: appointment.date,
       time: appointment.time,
       id: appointment.userId?.studentId || `STU-${String(appointment._id).slice(-4).toUpperCase()}`,
       counsellor: appointment.counselorId?.name || "Unassigned",
@@ -601,6 +602,7 @@ router.get("/counselling", verifyToken, ensureAdmin, async (_req, res) => {
         lowRisk,
         moderate,
         csce: counsellors.length,
+        counsellorsCount: counsellors.length,
         highRisk: round((high / total) * 100),
       },
       appointments: appointmentsData,

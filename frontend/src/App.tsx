@@ -12,7 +12,7 @@ import ChatInvent from "./chatboat/Invent";
 import HybridChat from "./chatboat/Hybrid";
 import Appointments from "./pages/Appointments";
 import Resources from "./pages/Resources";
-import Community from "./pages/Community";
+import Community from "./pages/Community1";
 import CommunityDetail from "./pages/CommunityDetails"
 import Quizzes from "./pages/Quizzes";
 import Mood from "./pages/Mood";

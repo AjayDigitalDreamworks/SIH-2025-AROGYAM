@@ -190,48 +190,62 @@
 
 import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
 import { PageHeader } from "../componentsAdmin/PageHeader";
-import { User, Bell, Shield, Palette, Globe, Lock, Mail, Phone, Save } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Mail, Phone, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "@/config/api";
 
+type AdminProfile = {
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  department: string;
+  campus: string;
+};
+
 export default function Settings() {
 
-  const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<AdminProfile>({
     name: "",
     email: "",
     phone: "",
     role: "",
     department: "",
-    campus: ""
-  })
+    campus: "",
+  });
 
   useEffect(() => {
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, []);
 
   const fetchProfile = async () => {
     try {
+      setLoading(true);
+      setError("");
       const res = await api.get("/api/admin/profile");
-
-      setProfile(res.data)
-
+      setProfile(res.data);
     } catch (err) {
-      console.log(err)
+      console.log(err);
+      setError("Unable to load profile.");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   const saveProfile = async () => {
     try {
       await api.put("/api/admin/profile", profile);
 
-      alert("Profile Updated")
+      alert("Profile Updated");
 
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -244,7 +258,9 @@ export default function Settings() {
     <DashboardLayout>
       <PageHeader title="Settings" subtitle="Manage your account and application preferences" />
 
-      <div className="grid grid-cols-4 gap-5">
+      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
 
         {/* Sidebar */}
 
@@ -268,7 +284,7 @@ export default function Settings() {
 
         {/* CONTENT */}
 
-        <div className="col-span-3 glass-card p-6">
+        <div className="lg:col-span-3 glass-card p-6">
 
           {/* PROFILE TAB */}
 
@@ -280,7 +296,10 @@ export default function Settings() {
                 Profile Settings
               </h2>
 
-              <div className="grid grid-cols-2 gap-4">
+              {loading ? (
+                <p className="text-sm text-muted-foreground">Loading profile...</p>
+              ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <div>
                   <label className="text-xs text-muted-foreground">Full Name</label>
@@ -355,6 +374,7 @@ export default function Settings() {
                 </div>
 
               </div>
+              )}
 
               <div className="flex justify-end mt-6">
                 <button

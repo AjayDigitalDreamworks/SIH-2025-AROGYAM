@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
   _id: string;
@@ -16,41 +17,55 @@ export default function Community() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", description: "" });
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   /* ================= USER ================= */
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
     const fetchUser = async () => {
-      const res = await axios.get(
-        "https://arogyam-9rll.onrender.com/current_user",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setUser(res.data);
+      try {
+        const res = await api.get("/current_user");
+        setUser(res.data?.user || null);
+      } catch (error) {
+        toast({
+          title: "Session expired",
+          description: "Please login again to continue.",
+          variant: "destructive",
+        });
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     };
 
     fetchUser();
-  }, [token]);
+  }, [token, navigate, toast]);
 
  
-// console.log("NESTED ROLE:", user?.user?.role);
-
-
-  const isVolunteer = user?.user?.role === "volunteer";
-
-  console.log(isVolunteer);
+  const isVolunteer = user?.role === "volunteer";
 
   /* ================= COMMUNITIES ================= */
   const fetchCommunities = async () => {
-    const res = await axios.get("https://arogyam-9rll.onrender.com/api/community");
-    setCommunities(res.data);
+    try {
+      const res = await api.get("/api/community");
+      setCommunities(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      toast({
+        title: "Unable to load communities",
+        description: "Please refresh and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -59,44 +74,51 @@ export default function Community() {
 
   /* ================= ACTIONS ================= */
   const joinCommunity = async (id: string) => {
-    await axios.post(
-      `https://arogyam-9rll.onrender.com/api/community/${id}/join`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    navigate(`/community/${id}`);
+    try {
+      await api.post(`/api/community/${id}/join`, {});
+      navigate(`/community/${id}`);
+    } catch (error) {
+      toast({
+        title: "Unable to join community",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
  const createCommunity = async () => {
-  if (!user) return;
+    if (!user || !form.name.trim()) return;
+    try {
+      setIsSubmitting(true);
+      await api.post("/api/community/create", {
+        ...form,
+        role: user.role,
+      });
 
-  await axios.post(
-    "https://arogyam-9rll.onrender.com/api/community/create",
-    {
-      ...form,
-      role: user.user.role, // <-- send role from frontend
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      toast({
+        title: "Community created",
+        description: "New community has been added successfully.",
+      });
+
+      setOpen(false);
+      setForm({ name: "", description: "" });
+      fetchCommunities();
+    } catch (error: any) {
+      toast({
+        title: "Failed to create community",
+        description: error?.response?.data?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  );
-
-  setOpen(false);
-  setForm({ name: "", description: "" });
-  fetchCommunities();
-};
+  };
 
 
   /* ================= UI ================= */
   return (
-    <div className="container mx-auto max-w-6xl py-8">
-      <div className="flex justify-between mb-6">
+    <div className="container mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-bold">Communities</h1>
 
         {/* ONLY VOLUNTEER */}
@@ -108,12 +130,18 @@ export default function Community() {
       </div>
 
       {/* COMMUNITY LIST */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {loading ? (
+        <div className="text-sm text-muted-foreground py-6">Loading communities...</div>
+      ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {communities.map((c: any) => (
-          <Card key={c._id} className="p-6">
+          <Card key={c._id} className="p-4 sm:p-6">
             <h2 className="font-semibold text-lg">{c.name}</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {c.description}
+              {c.description || "No description available."}
+            </p>
+            <p className="text-xs text-muted-foreground mb-4">
+              {(c.members?.length ?? 0)} members
             </p>
 
             <Button size="sm" onClick={() => joinCommunity(c._id)}>
@@ -122,6 +150,13 @@ export default function Community() {
           </Card>
         ))}
       </div>
+      )}
+
+      {!loading && communities.length === 0 && (
+        <Card className="p-6 text-sm text-muted-foreground">
+          No communities found. {isVolunteer ? "Create one to get started." : "Please check back later."}
+        </Card>
+      )}
 
       {/* CREATE COMMUNITY MODAL */}
       {isVolunteer && (
@@ -145,8 +180,8 @@ export default function Community() {
               }
             />
 
-            <Button onClick={createCommunity}>
-              Create
+            <Button onClick={createCommunity} disabled={isSubmitting || !form.name.trim()}>
+              {isSubmitting ? "Creating..." : "Create"}
             </Button>
           </DialogContent>
         </Dialog>
