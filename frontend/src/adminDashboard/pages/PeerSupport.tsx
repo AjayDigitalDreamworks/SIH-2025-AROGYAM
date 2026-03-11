@@ -129,7 +129,7 @@ import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
 import { PageHeader } from "../componentsAdmin/PageHeader";
 import { Users, MessageCircle, Heart, Star, Clock, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 export default function PeerSupport() {
 
@@ -151,7 +151,7 @@ fetchData()
 const fetchData = async ()=>{
 try{
 
-const res = await axios.get("http://localhost:3000/api/admin/peer-support")
+const res = await api.get("/api/admin/peer-support")
 
 setStats(res.data.stats)
 setPeerMentors(res.data.peerMentors)

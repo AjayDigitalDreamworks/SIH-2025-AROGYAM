@@ -7,11 +7,12 @@ const AppointmentSchema = new mongoose.Schema({
   // Time stored as string in format 'HH:mm' or 'HH:mm:ss'
   time: { type: String, required: true },
   type: { type: String, required: true },
+  mode: { type: String, enum: ["Online", "Offline"], default: "Online" },
   fullName: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
   discussion: { type: String },
-  status: { type: String, enum: ['pending','accepted','rejected','modified','cancelled'], default: 'pending' },
+  status: { type: String, enum: ['pending','accepted','rejected','modified','cancelled','completed'], default: 'pending' },
   requestedAt: { type: Date, default: Date.now },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, refPath: 'updatedByModel' },

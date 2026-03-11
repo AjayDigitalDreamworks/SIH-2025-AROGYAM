@@ -1,89 +1,3 @@
-// const mongoose = require("mongoose");
-// const bcrypt = require("bcryptjs");
-
-// // User schema definition
-// const UserSchema = new mongoose.Schema({
-//   fullName: {
-//     type: String,
-//     required: true,
-//     trim: true,
-//   },
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//     lowercase: true,
-//     trim: true,
-//   },
-//   phone: {
-//     type: String,
-//     trim: true,
-//   },
-//   avatar: {
-//     type: String,
-//     default: "🎓",
-//   },
-//   university: {
-//     type: String,
-//     trim: true,
-//   },
-//   yearOfStudy: {
-//     type: String,
-//     enum: ["Freshman", "Sophomore", "Junior", "Senior", "Graduate", "Other"],
-//   },
-  // moodHistory: [
-  //   {
-  //     date: { type: Date, default: Date.now },
-  //     mood: { type: Number, min: 1, max: 5, required: true },
-  //     notes: { type: String, trim: true },
-  //   },
-  // ],
-  // sleepHistory: [
-  //   {
-  //     date: { type: Date, default: Date.now },
-  //     hours: { type: Number, min: 0, max: 24, required: true },
-  //     quality: { type: Number, min: 1, max: 5, required: true },
-  //   },
-  // ],
-  // appointments: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Appointment",
-  //   },
-  // ],
-  // quizScores: [
-  //   {
-  //     score: { type: Number, required: true },
-  //     quiz_type: { type: String, required: true },
-  //     date: { type: Date, default: Date.now },
-  //   },
-  // ],
-//   createdAt: { type: Date, default: Date.now },
-//   updatedAt: { type: Date, default: Date.now },
-// });
-
-// // Hash password before saving the user
-// UserSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   try {
-//     const salt = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(this.password, salt);
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// // Compare password method
-// UserSchema.methods.comparePassword = async function (password) {
-//   return bcrypt.compare(password, this.password);
-// };
-
-// // User model creation
-// const User = mongoose.model("User", UserSchema);
-// module.exports = User;
-
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -107,6 +21,12 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+  studentId: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true,
+  },
   phone: {
     type: String,
     trim: true,
@@ -127,11 +47,64 @@ const UserSchema = new mongoose.Schema({
     type: String,
     enum: ['1','2','3','4'],
   },
+  department: {
+    type: String,
+    trim: true,
+    default: "General",
+  },
+  section: {
+    type: String,
+    trim: true,
+    default: "A",
+  },
+  residenceType: {
+    type: String,
+    enum: ["Hostel", "Day Scholar"],
+    default: "Hostel",
+  },
 
   role: {
     type: String,
     enum: ["student", "volunteer"],
     default: "student",
+  },
+  wellbeingScore: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 70,
+  },
+  riskLevel: {
+    type: String,
+    enum: ["Low", "Moderate", "High"],
+    default: "Low",
+  },
+  riskFactors: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
+  lastRiskCheckAt: {
+    type: Date,
+    default: Date.now,
+  },
+  crisisAlertsCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  emergencyCasesCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  peerMentorProfile: {
+    isMentor: { type: Boolean, default: false },
+    specialty: { type: String, trim: true, default: "" },
+    sessionsHandled: { type: Number, default: 0, min: 0 },
+    mentorRating: { type: Number, default: 0, min: 0, max: 5 },
+    available: { type: Boolean, default: false },
   },
 
     moodHistory: [

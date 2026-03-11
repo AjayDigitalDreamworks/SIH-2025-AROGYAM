@@ -223,7 +223,7 @@ import { PageHeader } from "../componentsAdmin/PageHeader";
 import { TipBanner } from "../componentsAdmin/TipBanner";
 import { ChevronLeft, ChevronRight, Settings, Plus, Video, Headphones, FileText, BookOpen, ThumbsUp } from "lucide-react";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 const resourceTypes = ["Video", "Audio", "PDF", "Article"];
 const filterTabs = ["All", "Video", "Audio", "Articles", "PDFs"];
@@ -257,7 +257,7 @@ const Resources = () => {
   const fetchResources = async ()=>{
     try{
 
-      const res = await axios.get("http://localhost:3000/videos/videos")
+      const res = await api.get("/videos/videos")
 
       setResources(res.data.videos || res.data)
 
@@ -283,14 +283,11 @@ const Resources = () => {
         formData.append("thumbnail",file)
       }
 
-      const token = localStorage.getItem("token")
-
-      await axios.post(
-        "http://localhost:3000/videos/upload",
+      await api.post(
+        "/videos/upload",
         formData,
         {
           headers:{
-            Authorization:`Bearer ${token}`,
             "Content-Type":"multipart/form-data"
           }
         }

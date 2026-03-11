@@ -230,7 +230,7 @@ import {
 } from "recharts";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 const RiskDetection = () => {
 
@@ -251,7 +251,7 @@ fetchData()
 const fetchData = async ()=>{
 try{
 
-const res = await axios.get("http://localhost:3000/api/admin/risk")
+const res = await api.get("/api/admin/risk")
 
 setRiskSummary(res.data.riskSummary)
 setStudents(res.data.students)

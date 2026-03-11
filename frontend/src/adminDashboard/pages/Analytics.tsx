@@ -355,7 +355,7 @@ import {
 } from "recharts";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -388,7 +388,7 @@ const Analytics = () => {
   const fetchAnalytics = async ()=>{
     try{
 
-      const res = await axios.get("http://localhost:3000/api/admin/analytics")
+      const res = await api.get("/api/admin/analytics")
 
       setBranchData(res.data.branchData)
       setTrendData(res.data.trendData)

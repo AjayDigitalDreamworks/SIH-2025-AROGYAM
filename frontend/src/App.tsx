@@ -128,7 +128,7 @@ const App = () => (
             {/* Admin routes (now protected) */}
             {/* <Route path="/admin" element={<AdminProtectedRoute><Layout><AdminDashboard /></Layout></AdminProtectedRoute>} /> */}
             <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
-            <Route path="/admin/register-counsellor" element={<AdminRegisterCounsellor />} />
+            <Route path="/admin/register-counsellor" element={<AdminProtectedRoute><AdminRegisterCounsellor /></AdminProtectedRoute>} />
             <Route path="/admin/resources" element={<AdminProtectedRoute><AdminResources /></AdminProtectedRoute>} />
             <Route path="/admin/emergency" element={<AdminProtectedRoute><AdminEmergency /></AdminProtectedRoute>} />
             <Route path="/admin/analytics" element={<AdminProtectedRoute><AdminAnalysis /></AdminProtectedRoute>} />

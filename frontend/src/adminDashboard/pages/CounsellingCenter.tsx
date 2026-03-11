@@ -222,7 +222,7 @@ import { PageHeader } from "../componentsAdmin/PageHeader";
 import { TipBanner } from "../componentsAdmin/TipBanner";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 const days = ["Mend", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sat"];
 
@@ -244,7 +244,7 @@ fetchData()
 const fetchData = async ()=>{
 try{
 
-const res = await axios.get("http://localhost:3000/api/admin/counselling")
+const res = await api.get("/api/admin/counselling")
 
 setAppointments(res.data.appointments)
 setCounsellors(res.data.counsellors)

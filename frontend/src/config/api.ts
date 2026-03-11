@@ -13,10 +13,16 @@ const api = axios.create({
 // Add an interceptor to add the Authorization header
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
-    const token = localStorage.getItem("token");
+    if (typeof window === "undefined") {
+      return config;
+    }
 
-    // If token exists, add it to the Authorization header
+    const requestUrl = config.url || "";
+    const isAdminRequest = requestUrl.startsWith("/api/admin");
+    const adminToken = localStorage.getItem("adminToken");
+    const userToken = localStorage.getItem("token");
+    const token = isAdminRequest ? adminToken || userToken : userToken || adminToken;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

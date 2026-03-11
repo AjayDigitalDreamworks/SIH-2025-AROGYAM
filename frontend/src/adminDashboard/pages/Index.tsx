@@ -309,7 +309,7 @@ import {
 } from "recharts";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 const Index = () => {
 
@@ -333,6 +333,8 @@ const Index = () => {
     emergencyCases: 0
   });
 
+  const peerPostsToday = peerTopics.reduce((sum, topic) => sum + (topic.count || 0), 0);
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -340,12 +342,13 @@ const Index = () => {
 const fetchDashboardData = async () => {
   try {
 
-    const overviewRes = await axios.get("http://localhost:3000/api/admin/overview");
-    const trendRes = await axios.get("http://localhost:3000/api/admin/trends");
-    const riskRes = await axios.get("http://localhost:3000/api/admin/risk-students");
-    const counsellorRes = await axios.get("http://localhost:3000/api/admin/counsellors");
-    const peerRes = await axios.get("http://localhost:3000/api/admin/peer-topics");
-    const reportRes = await axios.get("http://localhost:3000/api/admin/reports");
+    const overviewRes = await api.get("/api/admin/overview");
+    console.log("Overview response:", overviewRes);
+    const trendRes = await api.get("/api/admin/trends");
+    const riskRes = await api.get("/api/admin/risk-students");
+    const counsellorRes = await api.get("/api/admin/counsellors");
+    const peerRes = await api.get("/api/admin/peer-topics");
+    const reportRes = await api.get("/api/admin/reports");
 
     setOverview(overviewRes.data.data || {});
     setTrendData(trendRes.data.data || []);
@@ -567,7 +570,7 @@ const fetchDashboardData = async () => {
             <h3 className="text-sm font-bold text-foreground mb-3">Peer Support</h3>
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare className="w-5 h-5 text-primary" />
-              <span className="text-2xl font-bold text-foreground">132</span>
+              <span className="text-2xl font-bold text-foreground">{peerPostsToday}</span>
               <span className="text-xs text-muted-foreground">Posts Today</span>
             </div>
             <div className="space-y-2">

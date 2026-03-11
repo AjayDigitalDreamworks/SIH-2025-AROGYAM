@@ -192,7 +192,7 @@ import { DashboardLayout } from "../componentsAdmin/DashboardLayout";
 import { PageHeader } from "../componentsAdmin/PageHeader";
 import { User, Bell, Shield, Palette, Globe, Lock, Mail, Phone, Save } from "lucide-react";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/config/api";
 
 export default function Settings() {
 
@@ -213,16 +213,7 @@ export default function Settings() {
 
   const fetchProfile = async () => {
     try {
-
-      const token = localStorage.getItem("token")
-
-      const res = await axios.get(
-        "http://localhost:3000/api/admin/profile",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+      const res = await api.get("/api/admin/profile");
 
       setProfile(res.data)
 
@@ -233,17 +224,7 @@ export default function Settings() {
 
   const saveProfile = async () => {
     try {
-
-      const token = localStorage.getItem("token")
-
-      await axios.put(
-        "http://localhost:3000/api/admin/profile",
-        profile,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+      await api.put("/api/admin/profile", profile);
 
       alert("Profile Updated")
 
