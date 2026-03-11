@@ -283,8 +283,15 @@ const Resources = () => {
         formData.append("thumbnail",file)
       }
 
+<<<<<<< HEAD
       await api.post(
         "/videos/upload",
+=======
+      const token = localStorage.getItem("token")
+
+      await axios.post(
+        "https://arogyam-9rll.onrender.com/videos/upload",
+>>>>>>> df0fa2421ee75bb908f9fad79c0fcfb4dbc984df
         formData,
         {
           headers:{
