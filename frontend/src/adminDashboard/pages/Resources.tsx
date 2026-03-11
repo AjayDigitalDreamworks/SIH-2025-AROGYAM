@@ -12,6 +12,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import api from "@/config/api";
+import axios from "axios";
 
 type ResourceItem = {
   _id?: string;
