@@ -224,6 +224,7 @@ import { TipBanner } from "../componentsAdmin/TipBanner";
 import { ChevronLeft, ChevronRight, Settings, Plus, Video, Headphones, FileText, BookOpen, ThumbsUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "@/config/api";
+import axios from "axios";
 
 const resourceTypes = ["Video", "Audio", "PDF", "Article"];
 const filterTabs = ["All", "Video", "Audio", "Articles", "PDFs"];
@@ -283,15 +284,10 @@ const Resources = () => {
         formData.append("thumbnail",file)
       }
 
-<<<<<<< HEAD
-      await api.post(
-        "/videos/upload",
-=======
       const token = localStorage.getItem("token")
 
       await axios.post(
         "https://arogyam-9rll.onrender.com/videos/upload",
->>>>>>> df0fa2421ee75bb908f9fad79c0fcfb4dbc984df
         formData,
         {
           headers:{
