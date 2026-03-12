@@ -11,6 +11,7 @@ import {
   Lightbulb,
   MessageCircle,
   Moon,
+  Sparkles,
   Stethoscope,
   Users,
 } from "lucide-react";
@@ -506,6 +507,24 @@ const Dashboard = () => {
               </button>
               <button className="student-theme-tertiary-btn" onClick={() => navigate("/chat")}>
                 <MessageCircle size={14} /> Open Chat
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="student-theme-card student-theme-cta-card">
+          <div className="student-theme-cta-icon">
+            <Sparkles size={20} />
+          </div>
+          <div className="student-theme-cta-content">
+            <h3>Student Support AI</h3>
+            <p>Get instant coping steps for stress, exam pressure, and burnout.</p>
+            <div className="student-theme-quick-actions">
+              <button className="student-theme-secondary-btn" onClick={() => navigate("/ai-support-model")}>
+                Open AI Support <ArrowRight size={14} />
+              </button>
+              <button className="student-theme-tertiary-btn" onClick={() => navigate("/resources")}>
+                Browse Resources <ArrowRight size={14} />
               </button>
             </div>
           </div>

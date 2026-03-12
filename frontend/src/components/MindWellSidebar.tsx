@@ -12,7 +12,9 @@ import {
   Phone,
   Star,
   Settings,
-  Award 
+  Award,
+  Sparkles,
+  BrainCircuit
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -30,6 +32,8 @@ import {
 const mainMenuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "AI Chatbot", url: "/chat", icon: MessageCircle },
+  { title: "AI Support Model", url: "/ai-support-model", icon: Sparkles },
+  { title: "ML Prediction", url: "/mental-health-prediction", icon: BrainCircuit },
   { title: "Book Appointment", url: "/appointments", icon: Calendar },
   { title: "Resource Hub", url: "/resources", icon: BookOpen },
   { title: "Community Forum", url: "/community", icon: Users },

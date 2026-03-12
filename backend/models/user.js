@@ -134,6 +134,20 @@ const UserSchema = new mongoose.Schema({
       date: { type: Date, default: Date.now },
     },
   ],
+  attendanceHistory: [
+    {
+      date: { type: Date, default: Date.now },
+      percent: { type: Number, min: 0, max: 100, required: true },
+      notes: { type: String, trim: true },
+    },
+  ],
+  academicScores: [
+    {
+      score: { type: Number, min: 0, max: 100, required: true },
+      term: { type: String, trim: true },
+      date: { type: Date, default: Date.now },
+    },
+  ],
   spentRewardPoints: {
     type: Number,
     default: 0,

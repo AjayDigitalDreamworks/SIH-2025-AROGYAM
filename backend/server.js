@@ -14,6 +14,7 @@ const authRoutes = require("./routes/authRoutes");
 const { verifyToken } = require("./middleware/authMiddleware");
 const interventionRoutes = require("./routes/interventionRoutes");
 const hybridRoutes = require("./routes/hybridRoutes");
+const studentAiRoutes = require("./routes/studentAiRoutes");
 const userRoutes = require('./routes/userRoutes');
 const counsellorAuth = require('./routes/counsellorAuth');
 const cron = require('node-cron');
@@ -73,6 +74,11 @@ app.use("/api/intervention", interventionRoutes);
 
 // hybrid
 app.use("/api/hybrid", hybridRoutes);
+
+// student dashboard AI model
+app.use("/api/student-ai", studentAiRoutes);
+// Compatibility route for bundled AI client
+app.use("/api/v1/chat", studentAiRoutes);
 
 // Example of another protected route (fetch user data)
 

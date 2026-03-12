@@ -7,6 +7,8 @@ import { Layout } from "@/components/Layout"; // Make sure Layout conditionally 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
+import StudentAiModel from "./pages/StudentAiModel";
+import StudentMlModel from "./pages/StudentMlModel";
 import MentalHealthChatbotUI from "./chatboat/chatSent";
 import ChatInvent from "./chatboat/Invent";
 import HybridChat from "./chatboat/Hybrid";
@@ -103,6 +105,8 @@ const App = () => (
             {/* Dashboard pages (post-login with Sidebar & Header) */}
             <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
             <Route path="/chat" element={<Layout><Chat /></Layout>} />
+            <Route path="/ai-support-model" element={<Layout><StudentAiModel /></Layout>} />
+            <Route path="/mental-health-prediction" element={<Layout><StudentMlModel /></Layout>} />
             <Route path="/games" element={<Layout><Games /></Layout>} />
             <Route path="/appointments" element={<Layout><Appointments /></Layout>} />
             <Route path="/resources" element={<Layout><Resources /></Layout>} />
