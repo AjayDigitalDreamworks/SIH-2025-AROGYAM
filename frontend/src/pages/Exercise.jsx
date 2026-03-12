@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import {
   Dumbbell, Play, Clock, Target, Trophy, ChevronRight, Zap,
   Moon, Wind, Coffee, Activity, Timer, X, ChevronLeft,
@@ -14,8 +14,8 @@ import {
 } from "recharts";
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
-const PURPLE = "#7c3aed";
-const PURPLE_LIGHT = "#8b5cf6";
+const PURPLE = "#0f766e";
+const PURPLE_LIGHT = "#0284c7";
 const purpleGrad = { background: `linear-gradient(135deg, ${PURPLE}, ${PURPLE_LIGHT})` };
 
 // ─── Weekly Chart Data ────────────────────────────────────────────────────────
@@ -361,108 +361,137 @@ export default function ExercisePage() {
   const [modalPlan, setModalPlan]           = useState(null);
 
   const weeklyGoals = { completed: 12, target: 15, streak: 5, minutes: 173 };
+  const weeklyGoalPct = Math.round((weeklyGoals.completed / weeklyGoals.target) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-slate-50/70">
       {modalPlan && <WorkoutModal plan={modalPlan} onClose={() => setModalPlan(null)} />}
 
-      <main className="container mx-auto px-6 py-8 max-w-7xl">
+      <main className="relative container mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="pointer-events-none absolute -top-14 left-8 h-36 w-36 rounded-full bg-cyan-200/45 blur-3xl" />
+        <div className="pointer-events-none absolute right-6 top-16 h-44 w-44 rounded-full bg-emerald-200/45 blur-3xl" />
 
-        {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-wellness-orange flex items-center justify-center">
-              <Dumbbell className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">Exercise Plans</h1>
-          </div>
-          <p className="text-muted-foreground">Student-friendly workouts to boost wellness and manage stress</p>
-        </div>
-
-        {/* ── This Week's Progress ────────────────────────────────────────── */}
-        <Card className="mb-8 border border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5" />
-              This Week's Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-1" style={{ color: PURPLE }}>{weeklyGoals.completed}</div>
-                <div className="text-sm text-muted-foreground">Workouts Completed</div>
-                <div className="mt-2 h-2 rounded-full bg-gray-200 overflow-hidden">
-                  <div className="h-full rounded-full transition-all"
-                    style={{ width: `${(weeklyGoals.completed / weeklyGoals.target) * 100}%`, background: PURPLE }} />
-                </div>
+        <section className="relative mb-8 overflow-hidden rounded-3xl border border-teal-200/60 bg-gradient-to-br from-teal-700 via-cyan-700 to-sky-700 p-6 text-white shadow-xl sm:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_45%)]" />
+          <div className="relative">
+            <Badge className="mb-3 border-white/20 bg-white/10 text-white hover:bg-white/20">
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              Student exercise dashboard
+            </Badge>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h1 className="text-2xl font-bold sm:text-4xl">Exercise Plans</h1>
+                <p className="mt-2 max-w-2xl text-sm text-cyan-100 sm:text-base">
+                  Student-friendly workouts to reduce stress, improve focus, and build healthy daily movement.
+                </p>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-orange-500 mb-1">{weeklyGoals.target}</div>
-                <div className="text-sm text-muted-foreground">Weekly Goal</div>
-                <Badge variant="secondary" className="mt-2">
-                  {Math.round((weeklyGoals.completed / weeklyGoals.target) * 100)}% Complete
+              <button
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-50"
+                onClick={() => setModalPlan(exercisePlans["study-break"][0])}
+              >
+                <Play className="h-4 w-4" />
+                Start Quick Break
+              </button>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Card className="border-white/20 bg-white/10 p-3 text-white shadow-none backdrop-blur">
+                <p className="text-2xl font-semibold">{weeklyGoals.completed}</p>
+                <p className="text-xs text-cyan-100">Completed</p>
+              </Card>
+              <Card className="border-white/20 bg-white/10 p-3 text-white shadow-none backdrop-blur">
+                <p className="text-2xl font-semibold">{weeklyGoals.target}</p>
+                <p className="text-xs text-cyan-100">Weekly Goal</p>
+              </Card>
+              <Card className="border-white/20 bg-white/10 p-3 text-white shadow-none backdrop-blur">
+                <p className="text-2xl font-semibold">{weeklyGoals.streak}</p>
+                <p className="text-xs text-cyan-100">Day Streak</p>
+              </Card>
+              <Card className="border-white/20 bg-white/10 p-3 text-white shadow-none backdrop-blur">
+                <p className="text-2xl font-semibold">{weeklyGoals.minutes}</p>
+                <p className="text-xs text-cyan-100">Minutes</p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <Card className="rounded-2xl border-slate-200 lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-slate-900">
+                  <Activity className="h-5 w-5" />
+                  Weekly Movement Activity
+                </CardTitle>
+                <Badge variant="secondary" className="text-xs">
+                  <TrendingUp className="mr-1 h-3 w-3" /> +18% this week
                 </Badge>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-500 mb-1">{weeklyGoals.streak}</div>
-                <div className="text-sm text-muted-foreground">Day Streak</div>
-                <div className="text-xs text-muted-foreground mt-1">Keep it up! 🔥</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={weeklyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={PURPLE_LIGHT} stopOpacity={0.25} />
+                      <stop offset="100%" stopColor={PURPLE_LIGHT} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="minutes"
+                    stroke={PURPLE}
+                    strokeWidth={2.5}
+                    fill="url(#chartGrad)"
+                    dot={{ fill: PURPLE, r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, fill: PURPLE }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
-        {/* ── Weekly Chart ─────────────────────────────────────────────────── */}
-        <Card className="mb-8 border border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Weekly Movement Activity
+          <Card className="rounded-2xl border-slate-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <Trophy className="h-5 w-5 text-amber-500" />
+                This Week
               </CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                <TrendingUp className="w-3 h-3 mr-1 inline" /> +18% this week
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={180}>
-              <AreaChart data={weeklyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor={PURPLE} stopOpacity={0.2} />
-                    <stop offset="100%" stopColor={PURPLE} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="day" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip />} />
-                <Area type="monotone" dataKey="minutes"
-                  stroke={PURPLE} strokeWidth={2.5}
-                  fill="url(#chartGrad)"
-                  dot={{ fill: PURPLE, r: 4, strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: PURPLE }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-center">
+                <div className="text-2xl font-bold text-emerald-700">{weeklyGoals.completed}</div>
+                <div className="text-xs text-slate-600">Workouts Completed</div>
+              </div>
+              <div className="rounded-xl border border-sky-100 bg-sky-50 p-3 text-center">
+                <div className="text-2xl font-bold text-sky-700">{weeklyGoalPct}%</div>
+                <div className="text-xs text-slate-600">Goal Completion</div>
+              </div>
+              <div className="rounded-xl border border-orange-100 bg-orange-50 p-3 text-center">
+                <div className="text-2xl font-bold text-orange-700">{weeklyGoals.streak} days</div>
+                <div className="text-xs text-slate-600">Current Streak</div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* ── Activity Tracker ─────────────────────────────────────────────── */}
-        <Card className="mb-8 border border-border">
+        <Card className="mb-8 rounded-2xl border-slate-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-slate-900">
               <Timer className="w-5 h-5" /> Activity Tracker
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
               {[
-                { label: "Workouts this week",    display: `${weeklyGoals.completed} / ${weeklyGoals.target}`, pct: Math.round(weeklyGoals.completed / weeklyGoals.target * 100), color: PURPLE      },
-                { label: "Minutes exercised",      display: `${weeklyGoals.minutes} / 300`,                     pct: Math.round(weeklyGoals.minutes / 300 * 100),                  color: PURPLE      },
-                { label: "Calories burned (est)",  display: "480 / 1000",                                        pct: 48,                                                           color: "#f97316"   },
-                { label: "Current streak",         display: `${weeklyGoals.streak} / 7 days`,                    pct: Math.round(weeklyGoals.streak / 7 * 100),                     color: "#22c55e"   },
+                { label: "Workouts this week", display: `${weeklyGoals.completed} / ${weeklyGoals.target}`, pct: weeklyGoalPct, color: PURPLE },
+                { label: "Minutes exercised", display: `${weeklyGoals.minutes} / 300`, pct: Math.round((weeklyGoals.minutes / 300) * 100), color: PURPLE_LIGHT },
+                { label: "Calories burned (est)", display: "480 / 1000", pct: 48, color: "#f97316" },
+                { label: "Current streak", display: `${weeklyGoals.streak} / 7 days`, pct: Math.round((weeklyGoals.streak / 7) * 100), color: "#22c55e" },
               ].map(({ label, display, pct, color }) => (
                 <div key={label}>
                   <div className="flex justify-between mb-1.5">
@@ -478,7 +507,6 @@ export default function ExercisePage() {
           </CardContent>
         </Card>
 
-        {/* ── Category Tabs ────────────────────────────────────────────────── */}
         <div className="mb-8">
           <div className="flex flex-wrap gap-2">
             {exerciseCategories.map(cat => {
@@ -486,9 +514,11 @@ export default function ExercisePage() {
               const active = activeCategory === cat.id;
               return (
                 <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all"
-                  style={active ? { ...purpleGrad, color: "#fff", borderColor: "transparent" }
-                                : { background: "#fff", color: "#374151", borderColor: "#d1d5db" }}>
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    active
+                      ? "bg-teal-700 text-white border-teal-700"
+                      : "bg-white text-gray-700 border-gray-300 hover:border-teal-300 hover:text-teal-700"
+                  }`}>
                   <Icon className="w-4 h-4" />
                   {cat.name}
                 </button>
@@ -497,28 +527,26 @@ export default function ExercisePage() {
           </div>
         </div>
 
-        {/* ── Exercise Plans Grid ───────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {exercisePlans[activeCategory]?.map((plan, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer border border-border">
+            <Card key={index} className="hover:shadow-xl hover:-translate-y-1 duration-300 transition-all cursor-pointer border border-slate-200 rounded-2xl">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-lg mb-1">{plan.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm text-slate-600">{plan.description}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-1 text-muted-foreground">
+                  <div className="flex items-center gap-1 text-slate-600">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">{plan.duration}</span>
                   </div>
                   <Badge variant="outline" className="text-xs">{plan.difficulty}</Badge>
-                  {/* Video badge */}
-                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200">
+                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
                     <Video className="w-3 h-3" /> Video
                   </span>
                 </div>
@@ -532,9 +560,7 @@ export default function ExercisePage() {
                   ))}
                 </div>
 
-                <button
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                  style={purpleGrad}
+                <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium bg-teal-700 hover:bg-teal-800 transition-colors"
                   onClick={() => setModalPlan(plan)}>
                   <Play className="w-4 h-4" />
                   Start Workout
@@ -544,8 +570,7 @@ export default function ExercisePage() {
           ))}
         </div>
 
-        {/* ── Recommended For You ───────────────────────────────────────────── */}
-        <Card className="mb-8 border border-border">
+        <Card className="mb-8 border border-slate-200 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-orange-500" />
@@ -564,9 +589,7 @@ export default function ExercisePage() {
                     <div className="flex items-center gap-1 text-gray-400 text-xs">
                       <Clock className="w-3 h-3" /> {rec.duration}
                     </div>
-                    <button
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-white text-xs font-medium hover:opacity-90 transition-opacity"
-                      style={purpleGrad}
+                    <button className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-white text-xs font-medium bg-teal-700 hover:bg-teal-800 transition-colors"
                       onClick={() => { setActiveCategory(rec.plan); setModalPlan(exercisePlans[rec.plan][rec.idx]); }}>
                       <Play className="w-3 h-3" /> Start
                     </button>
@@ -577,10 +600,9 @@ export default function ExercisePage() {
           </CardContent>
         </Card>
 
-        {/* ── Movement Reminder ─────────────────────────────────────────────── */}
-        <Card className="mb-8 border border-violet-200 bg-violet-50/50">
+        <Card className="mb-8 border border-teal-200 bg-teal-50/70 rounded-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2" style={{ color: PURPLE }}>
+            <CardTitle className="flex items-center gap-2 text-teal-800">
               <Bell className="w-5 h-5" />
               Take a Movement Break
             </CardTitle>
@@ -589,9 +611,7 @@ export default function ExercisePage() {
             <p className="text-sm text-muted-foreground flex-1">
               Sitting too long can reduce focus. Take a 2-minute stretch break right now to refresh your mind and body.
             </p>
-            <button
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-medium shrink-0 hover:opacity-90 transition-opacity"
-              style={purpleGrad}
+            <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-medium shrink-0 bg-teal-700 hover:bg-teal-800 transition-colors"
               onClick={() => setModalPlan(exercisePlans["study-break"][0])}>
               <Play className="w-4 h-4" />
               Start 2-Minute Stretch
@@ -599,8 +619,7 @@ export default function ExercisePage() {
           </CardContent>
         </Card>
 
-        {/* ── Tips ─────────────────────────────────────────────────────────── */}
-        <Card className="border border-border">
+        <Card className="border border-slate-200 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
@@ -624,8 +643,8 @@ export default function ExercisePage() {
                   <h4 className="font-medium text-orange-500 mb-2">Energy Boost</h4>
                   <p className="text-sm text-muted-foreground">Morning exercises increase alertness and energy levels throughout the day, improving academic performance.</p>
                 </div>
-                <div className="p-4 rounded-lg bg-violet-50">
-                  <h4 className="font-medium mb-2" style={{ color: PURPLE }}>Better Sleep</h4>
+                <div className="p-4 rounded-lg bg-indigo-50">
+                  <h4 className="font-medium mb-2 text-indigo-700">Better Sleep</h4>
                   <p className="text-sm text-muted-foreground">Evening stretches and relaxation exercises prepare your body for quality sleep after a busy day.</p>
                 </div>
               </div>

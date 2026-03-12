@@ -379,6 +379,8 @@ app.use('/api/sleep', sleepRoutes);
 
 const quizRoutes = require('./routes/quizRoutes');
 app.use('/api/quiz', quizRoutes);
+const rewardRoutes = require('./routes/rewardRoutes');
+app.use('/api/rewards', rewardRoutes);
 
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);

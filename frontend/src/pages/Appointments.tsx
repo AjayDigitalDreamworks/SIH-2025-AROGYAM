@@ -11,7 +11,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Mail, MapPin, Phone } from "lucide-react";
+import {
+  Calendar,
+  CalendarClock,
+  Mail,
+  MapPin,
+  Phone,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/config/api";
 
@@ -58,8 +67,7 @@ const formatDateLabel = (value?: string) => {
   });
 };
 
-const normalizeTime = (value?: string) =>
-  (value || "").replace(/\s+/g, "").toLowerCase();
+const normalizeTime = (value?: string) => (value || "").replace(/\s+/g, "").toLowerCase();
 
 const formatHourSlot = (hour24: number) =>
   new Date(1970, 0, 1, hour24, 0).toLocaleTimeString("en-US", {
@@ -68,15 +76,14 @@ const formatHourSlot = (hour24: number) =>
     hour12: true,
   });
 
-const getDefaultSlots = () =>
-  Array.from({ length: 9 }, (_, index) => formatHourSlot(index + 9));
+const getDefaultSlots = () => Array.from({ length: 9 }, (_, idx) => formatHourSlot(idx + 9));
 
 const getStatusClassName = (status?: string) => {
   const normalized = (status || "").toLowerCase();
-  if (normalized === "accepted") return "text-emerald-600";
-  if (normalized === "rejected" || normalized === "cancelled") return "text-red-600";
-  if (normalized === "modified") return "text-amber-600";
-  return "text-blue-600";
+  if (normalized === "accepted") return "text-emerald-700 bg-emerald-50 border-emerald-200";
+  if (normalized === "rejected" || normalized === "cancelled") return "text-red-700 bg-red-50 border-red-200";
+  if (normalized === "modified") return "text-amber-700 bg-amber-50 border-amber-200";
+  return "text-blue-700 bg-blue-50 border-blue-200";
 };
 
 export default function Appointments() {
@@ -107,11 +114,7 @@ export default function Appointments() {
   const suggestedTypes = useMemo(() => {
     const specialty = selectedCounselorData?.specialty;
     if (!specialty) return [];
-    return [
-      `${specialty} Consultation`,
-      `${specialty} Follow-up`,
-      `${specialty} Assessment`,
-    ];
+    return [`${specialty} Consultation`, `${specialty} Follow-up`, `${specialty} Assessment`];
   }, [selectedCounselorData]);
 
   const availableTimeSlots = useMemo(() => {
@@ -123,18 +126,22 @@ export default function Appointments() {
     const checks = [
       { label: "Counselor selected", done: Boolean(selectedCounselor) },
       { label: "Date and time selected", done: Boolean(selectedDate && selectedTime) },
-      { label: "Appointment type provided", done: Boolean(appointmentType.trim()) },
-      { label: "Contact information complete", done: Boolean(formData.name && formData.email && formData.phone) },
+      { label: "Session type provided", done: Boolean(appointmentType.trim()) },
+      { label: "Contact details complete", done: Boolean(formData.name && formData.email && formData.phone) },
     ];
     const doneCount = checks.filter((item) => item.done).length;
     return { checks, doneCount, total: checks.length };
   }, [selectedCounselor, selectedDate, selectedTime, appointmentType, formData]);
 
+  const upcomingCount = myAppointments.filter((item) =>
+    ["pending", "accepted", "modified"].includes((item.status || "").toLowerCase())
+  ).length;
+
   const fetchMyAppointments = async () => {
     try {
       const response = await api.get("/appointments/mine");
       setMyAppointments(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
+    } catch {
       setMyAppointments([]);
     }
   };
@@ -181,13 +188,13 @@ export default function Appointments() {
       }
 
       try {
-        const response = await api.get("/appointments", {
-          params: { counselorId: selectedCounselor },
-        });
+        const response = await api.get("/appointments", { params: { counselorId: selectedCounselor } });
         const appointments = Array.isArray(response.data) ? response.data : [];
         const blocked = appointments
           .filter((item: AppointmentItem) => item.date === selectedDate)
-          .filter((item: AppointmentItem) => !["rejected", "cancelled"].includes((item.status || "").toLowerCase()))
+          .filter((item: AppointmentItem) =>
+            !["rejected", "cancelled"].includes((item.status || "").toLowerCase())
+          )
           .map((item: AppointmentItem) => item.time || "")
           .filter(Boolean);
         setTakenSlots(blocked);
@@ -248,10 +255,7 @@ export default function Appointments() {
     try {
       setBooking(true);
       await api.post("/appointments", appointmentPayload);
-      toast({
-        title: "Appointment booked",
-        description: "Your request has been submitted.",
-      });
+      toast({ title: "Appointment booked", description: "Your request has been submitted." });
 
       setSelectedCounselor("");
       setSelectedDate("");
@@ -281,46 +285,69 @@ export default function Appointments() {
   };
 
   return (
-    <div className="container mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl font-bold sm:text-3xl mb-2">Book Counseling Appointment</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Schedule a session with our professional counselors
-        </p>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <section className="relative mb-6 overflow-hidden rounded-3xl border border-teal-200/70 bg-gradient-to-br from-teal-700 via-cyan-700 to-sky-700 p-6 text-white shadow-xl sm:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.24),transparent_45%)]" />
+        <div className="relative">
+          <Badge className="mb-3 border-white/25 bg-white/10 text-white hover:bg-white/20">
+            <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+            Professional support booking
+          </Badge>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold sm:text-3xl">Book Counseling Appointment</h1>
+              <p className="mt-1 text-sm text-cyan-100 sm:text-base">
+                Schedule a confidential session with a counselor based on your needs.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center text-xs sm:text-sm">
+              <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2">
+                <div className="text-lg font-bold">{counselors.length}</div>
+                <div className="text-cyan-100">Counselors</div>
+              </div>
+              <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2">
+                <div className="text-lg font-bold">{upcomingCount}</div>
+                <div className="text-cyan-100">Active Requests</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Choose Your Counselor</h3>
+        <div className="space-y-6 lg:col-span-2">
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Choose Your Counselor</h3>
             {loadingCounselors ? (
-              <div className="text-sm text-muted-foreground">Loading counselors...</div>
+              <div className="text-sm text-slate-500">Loading counselors...</div>
             ) : counselors.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No counselors available right now.</div>
+              <div className="text-sm text-slate-500">No counselors available right now.</div>
             ) : (
               <div className="grid gap-3 sm:gap-4">
                 {counselors.map((counselor) => (
                   <button
                     type="button"
                     key={counselor._id}
-                    className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
+                    className={`w-full rounded-xl border p-4 text-left transition ${
                       selectedCounselor === counselor._id
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50"
+                        ? "border-teal-300 bg-teal-50"
+                        : "border-slate-200 hover:border-teal-200 hover:bg-slate-50"
                     }`}
                     onClick={() => setSelectedCounselor(counselor._id)}
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="text-2xl sm:text-3xl">{counselor.image || "👩‍⚕️"}</div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate">{counselor.name || "Counselor"}</h4>
-                        <p className="text-sm text-muted-foreground truncate">
+                      <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-600 border border-slate-200">
+                        <UserRound className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate font-medium text-slate-900">{counselor.name || "Counselor"}</h4>
+                        <p className="truncate text-sm text-slate-600">
                           {counselor.specialty || "General support"}
                         </p>
-                        <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                        <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
                           <span>
                             {typeof counselor.rating === "number"
-                              ? `★ ${counselor.rating.toFixed(1)}`
+                              ? `Rating ${counselor.rating.toFixed(1)}`
                               : "Rating unavailable"}
                           </span>
                           <span>{counselor.experience || "Experience unavailable"}</span>
@@ -333,9 +360,9 @@ export default function Appointments() {
             )}
           </Card>
 
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Select Date & Time</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Select Date and Time</h3>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="date">Preferred Date</Label>
                 <Input
@@ -348,7 +375,11 @@ export default function Appointments() {
               </div>
               <div>
                 <Label htmlFor="time">Preferred Time</Label>
-                <Select value={selectedTime} onValueChange={setSelectedTime} disabled={!selectedCounselor || !selectedDate}>
+                <Select
+                  value={selectedTime}
+                  onValueChange={setSelectedTime}
+                  disabled={!selectedCounselor || !selectedDate}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
@@ -358,26 +389,26 @@ export default function Appointments() {
                         {time}
                       </SelectItem>
                     ))}
-                    {availableTimeSlots.length === 0 && (
+                    {availableTimeSlots.length === 0 ? (
                       <SelectItem value="no-slots" disabled>
                         No slots available
                       </SelectItem>
-                    )}
+                    ) : null}
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            {selectedCounselor && selectedDate && (
-              <p className="mt-3 text-xs text-muted-foreground">
+            {selectedCounselor && selectedDate ? (
+              <p className="mt-3 text-xs text-slate-500">
                 {takenSlots.length
                   ? `${takenSlots.length} slot(s) already booked for ${formatDateLabel(selectedDate)}.`
-                  : "All standard slots are available for the selected day."}
+                  : "All standard slots are currently available for this day."}
               </p>
-            )}
+            ) : null}
           </Card>
 
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Appointment Focus</h3>
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Appointment Focus</h3>
             <div className="space-y-3">
               <Label htmlFor="appointmentType">Session Type</Label>
               <Input
@@ -386,7 +417,7 @@ export default function Appointments() {
                 onChange={(e) => setAppointmentType(e.target.value)}
                 placeholder="e.g. Anxiety support session"
               />
-              {suggestedTypes.length > 0 && (
+              {suggestedTypes.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {suggestedTypes.map((suggestion) => (
                     <Button
@@ -400,14 +431,14 @@ export default function Appointments() {
                     </Button>
                   ))}
                 </div>
-              )}
+              ) : null}
             </div>
           </Card>
 
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Your Information</h3>
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Your Information</h3>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <Label htmlFor="name">Full Name *</Label>
                   <Input
@@ -450,46 +481,37 @@ export default function Appointments() {
             </div>
           </Card>
 
-          <Button onClick={handleBooking} className="w-full" size="lg" disabled={booking}>
-            <Calendar className="w-4 h-4 mr-2" />
+          <Button onClick={handleBooking} className="w-full bg-teal-700 hover:bg-teal-800" size="lg" disabled={booking}>
+            <Calendar className="mr-2 h-4 w-4" />
             {booking ? "Booking..." : "Book Appointment"}
           </Button>
 
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-3">Your Appointments</h3>
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-3 text-lg font-semibold text-slate-900">Your Appointments</h3>
             {myAppointments.length === 0 ? (
-              <div className="text-sm text-muted-foreground">You have no appointment requests yet.</div>
+              <div className="text-sm text-slate-500">You have no appointment requests yet.</div>
             ) : (
               <div className="space-y-3">
                 {myAppointments.map((appointment) => (
-                  <div
-                    key={appointment._id}
-                    className="rounded-lg border border-border p-3 sm:p-4"
-                  >
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="font-medium">{appointment.type || "Counselling session"}</div>
-                      <div className={`text-xs sm:text-sm font-medium ${getStatusClassName(appointment.status)}`}>
+                  <div key={appointment._id} className="rounded-xl border border-slate-200 p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="font-medium text-slate-900">{appointment.type || "Counselling session"}</div>
+                      <span className={`inline-flex w-fit rounded-full border px-2 py-0.5 text-xs font-medium ${getStatusClassName(appointment.status)}`}>
                         {(appointment.status || "pending").toUpperCase()}
-                      </div>
+                      </span>
                     </div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {formatDateLabel(appointment.date)} · {appointment.time || "Time pending"}
+                    <div className="mt-1 text-sm text-slate-600">
+                      {formatDateLabel(appointment.date)} - {appointment.time || "Time pending"}
                     </div>
-                    {appointment.counselorId?.name && (
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Counselor: {appointment.counselorId.name}
-                      </div>
-                    )}
-                    {appointment.discussion && (
-                      <div className="mt-2 text-sm text-muted-foreground">
-                        {appointment.discussion}
-                      </div>
-                    )}
-                    {appointment.responseNote && (
-                      <div className="mt-2 text-xs text-muted-foreground">
-                        Note: {appointment.responseNote}
-                      </div>
-                    )}
+                    {appointment.counselorId?.name ? (
+                      <div className="mt-1 text-sm text-slate-600">Counselor: {appointment.counselorId.name}</div>
+                    ) : null}
+                    {appointment.discussion ? (
+                      <div className="mt-2 text-sm text-slate-600">{appointment.discussion}</div>
+                    ) : null}
+                    {appointment.responseNote ? (
+                      <div className="mt-2 text-xs text-slate-500">Note: {appointment.responseNote}</div>
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -498,16 +520,22 @@ export default function Appointments() {
         </div>
 
         <div className="space-y-6">
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Booking Readiness</h3>
-            <div className="mb-3 text-sm text-muted-foreground">
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Booking Readiness</h3>
+            <div className="mb-3 text-sm text-slate-600">
               {progressChecklist.doneCount}/{progressChecklist.total} steps complete
+            </div>
+            <div className="mb-4 h-2 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-teal-600 transition-all"
+                style={{ width: `${(progressChecklist.doneCount / progressChecklist.total) * 100}%` }}
+              />
             </div>
             <div className="space-y-2">
               {progressChecklist.checks.map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{item.label}</span>
-                  <span className={item.done ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"}>
+                  <span className="text-slate-600">{item.label}</span>
+                  <span className={item.done ? "font-medium text-emerald-600" : "font-medium text-amber-600"}>
                     {item.done ? "Done" : "Pending"}
                   </span>
                 </div>
@@ -515,33 +543,30 @@ export default function Appointments() {
             </div>
           </Card>
 
-          <Card className="wellness-card p-5 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">Support Contact</h3>
+          <Card className="rounded-2xl border-slate-200 p-5 sm:p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900">
+              <CalendarClock className="h-5 w-5 text-teal-700" />
+              Support Contact
+            </h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="break-all">
-                  {selectedCounselorData?.email || formData.email || "support@arogyam.app"}
-                </span>
+                <Mail className="h-4 w-4 text-teal-700" />
+                <span className="break-all">{selectedCounselorData?.email || formData.email || "support@arogyam.app"}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-primary" />
+                <Phone className="h-4 w-4 text-teal-700" />
                 <span>{formData.phone || "Update your phone in profile"}</span>
               </div>
               <div className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span>
-                  {currentUser?.university
-                    ? `${currentUser.university} Counselling Center`
-                    : "Campus counselling center"}
-                </span>
+                <MapPin className="h-4 w-4 text-teal-700" />
+                <span>{currentUser?.university ? `${currentUser.university} Counselling Center` : "Campus counselling center"}</span>
               </div>
             </div>
           </Card>
 
-          <Card className="wellness-card p-5 sm:p-6 border-red-200 bg-red-50/50">
-            <h3 className="text-lg font-semibold mb-2 text-red-700">Crisis Support</h3>
-            <p className="text-sm text-red-600 mb-3">
+          <Card className="rounded-2xl border-red-200 bg-red-50/70 p-5 sm:p-6">
+            <h3 className="mb-2 text-lg font-semibold text-red-700">Crisis Support</h3>
+            <p className="mb-3 text-sm text-red-600">
               If you are facing immediate risk, contact emergency support now.
             </p>
             <Button
@@ -550,7 +575,7 @@ export default function Appointments() {
               size="sm"
               onClick={() => (window.location.href = "tel:988")}
             >
-              <Phone className="w-4 h-4 mr-2" />
+              <Phone className="mr-2 h-4 w-4" />
               Call Crisis Line: 988
             </Button>
           </Card>

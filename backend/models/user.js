@@ -134,6 +134,19 @@ const UserSchema = new mongoose.Schema({
       date: { type: Date, default: Date.now },
     },
   ],
+  spentRewardPoints: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  redeemedRewards: [
+    {
+      rewardId: { type: String, required: true, trim: true },
+      title: { type: String, trim: true },
+      cost: { type: Number, required: true, min: 0 },
+      redeemedAt: { type: Date, default: Date.now },
+    },
+  ],
 
   createdAt: {
     type: Date,

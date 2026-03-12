@@ -269,6 +269,10 @@ const Dashboard = () => {
   const featuredResource = allResources[0];
   const upcomingAppointment = appointments[0];
   const topCommunities = communities.slice(0, 2);
+  const displayName = user?.fullName || user?.username || "Student";
+  const nextSessionLabel = upcomingAppointment
+    ? `${formatDateLabel(upcomingAppointment.date)} · ${upcomingAppointment.time || "Time TBD"}`
+    : "No session scheduled";
 
   const dynamicTip = useMemo(() => {
     if (!latestMood) return "Start with today's mood check-in to unlock your daily insight.";
@@ -295,6 +299,28 @@ const Dashboard = () => {
 
   return (
     <div className="student-theme-root">
+      <section className="student-theme-hero">
+        <div className="student-theme-hero-copy">
+          <p>Welcome back, {displayName}</p>
+          <h1>Student Wellness Home</h1>
+          <span>{dynamicTip}</span>
+        </div>
+        <div className="student-theme-hero-stats">
+          <article>
+            <small>Wellbeing</small>
+            <strong>{wellbeingScore}/100</strong>
+          </article>
+          <article>
+            <small>Current Streak</small>
+            <strong>{streak} days</strong>
+          </article>
+          <article>
+            <small>Next Session</small>
+            <strong>{nextSessionLabel}</strong>
+          </article>
+        </div>
+      </section>
+
       <div className="student-theme-tip">
         <Lightbulb size={16} />
         <span>{dynamicTip}</span>
