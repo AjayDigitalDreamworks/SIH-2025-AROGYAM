@@ -59,6 +59,95 @@
     --glass-bg: 0 0% 100% / 0.7;
     --glass-border: 0 0% 100% / 0.5;
   }
+
+  .dark {
+    --background: 220 24% 10%;
+    --foreground: 210 40% 96%;
+
+    --card: 220 22% 12%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 220 22% 12%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 200 75% 55%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 220 16% 16%;
+    --muted-foreground: 215 20% 70%;
+
+    --accent: 200 35% 20%;
+    --accent-foreground: 200 70% 88%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 40% 96%;
+
+    --border: 220 16% 22%;
+    --input: 220 16% 22%;
+    --ring: 200 75% 55%;
+
+    --sidebar-background: 220 20% 11%;
+    --sidebar-foreground: 215 20% 75%;
+    --sidebar-primary: 200 75% 55%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 200 30% 18%;
+    --sidebar-accent-foreground: 200 70% 88%;
+    --sidebar-border: 220 16% 22%;
+    --sidebar-ring: 200 75% 55%;
+
+    --glass-bg: 220 24% 12% / 0.6;
+    --glass-border: 220 24% 12% / 0.45;
+  }
+
+  /* Student dashboard theme overrides (teal/cyan) */
+  .student-theme-scope {
+    --primary: 191 85% 37%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 203 89% 53%;
+    --primary-dark: 173 77% 26%;
+    --accent: 190 60% 92%;
+    --accent-foreground: 191 70% 30%;
+    --ring: 203 89% 53%;
+    --sidebar-background: 190 30% 96%;
+    --sidebar-foreground: 190 25% 32%;
+    --sidebar-primary: 191 85% 37%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 190 55% 90%;
+    --sidebar-accent-foreground: 191 70% 30%;
+    --sidebar-border: 190 25% 88%;
+    --sidebar-ring: 203 89% 53%;
+    --gradient-primary: linear-gradient(135deg, hsl(173 77% 26%), hsl(191 85% 37%), hsl(203 89% 53%));
+    --gradient-wellness: linear-gradient(135deg, hsl(191 85% 37%), hsl(203 89% 53%));
+    --shadow-wellness: 0 8px 25px hsl(191 85% 37% / 0.18);
+    --arogyam-purple: 191 85% 37%;
+    --arogyam-lavender: 190 50% 93%;
+  }
+
+  .dark .student-theme-scope {
+    --primary: 200 85% 55%;
+    --primary-foreground: 210 40% 98%;
+    --primary-light: 200 90% 62%;
+    --primary-dark: 191 80% 32%;
+    --accent: 200 30% 18%;
+    --accent-foreground: 200 70% 88%;
+    --ring: 200 85% 55%;
+    --sidebar-background: 210 20% 12%;
+    --sidebar-foreground: 200 30% 80%;
+    --sidebar-primary: 200 85% 55%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 200 30% 18%;
+    --sidebar-accent-foreground: 200 70% 88%;
+    --sidebar-border: 210 16% 22%;
+    --sidebar-ring: 200 85% 55%;
+    --gradient-primary: linear-gradient(135deg, hsl(191 80% 32%), hsl(200 85% 55%));
+    --gradient-wellness: linear-gradient(135deg, hsl(191 80% 32%), hsl(200 85% 55%));
+    --shadow-wellness: 0 8px 25px hsl(200 85% 55% / 0.22);
+    --arogyam-purple: 200 85% 55%;
+    --arogyam-lavender: 200 30% 18%;
+  }
 }
 
 @layer base {
@@ -70,6 +159,16 @@
     @apply bg-background text-foreground font-sans;
     font-family: 'Nunito', sans-serif;
     background-image: url('/images/bg-pattern.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(14, 116, 144, 0.18), transparent 35%),
+      radial-gradient(circle at 85% 20%, rgba(14, 165, 233, 0.16), transparent 38%),
+      linear-gradient(160deg, #061a20 0%, #071f2a 60%, #081c2a 100%);
     background-size: cover;
     background-attachment: fixed;
     background-position: center;

@@ -27,6 +27,8 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const userName = localStorage.getItem("userName") || "User";
+  const userEmail = localStorage.getItem("userEmail") || "User";
 
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
@@ -78,19 +80,42 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const path = location.pathname || "";
+  const isStudent = !path.startsWith("/counsellor") && !path.startsWith("/admin");
+  const headerClassName = isStudent
+    ? "border-b border-[#0e7490]/25 bg-[linear-gradient(168deg,_rgba(240,249,255,0.95)_0%,_rgba(232,251,246,0.92)_48%,_rgba(236,246,255,0.95)_100%)] shadow-[0_8px_24px_rgba(15,76,96,0.12)] backdrop-blur dark:border-white/10 dark:bg-[linear-gradient(168deg,_rgba(6,26,32,0.98)_0%,_rgba(7,36,44,0.96)_48%,_rgba(8,34,50,0.98)_100%)]"
+    : "bg-card border-b border-border";
+  const searchInputClassName = isStudent
+    ? "pl-10 pr-4 py-2 rounded-lg border w-52 lg:w-80 text-sm focus:outline-none focus:ring-2 shadow-sm bg-white/80 border-[#0e7490]/20 text-slate-700 placeholder:text-slate-500 focus:ring-[#0ea5e9]/25 focus:border-[#0ea5e9]/40 dark:bg-slate-900/50 dark:border-white/10 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:ring-[#38bdf8]/30"
+    : "pl-10 pr-4 py-2 bg-muted rounded-lg border border-border w-52 lg:w-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20";
   const sidebar = path.startsWith("/counsellor")
     ? <CounsellorSidebar />
     : path.startsWith("/admin")
       ? <AdminSidebar />
       : <MindWellSidebar />;
+  const avatarFallbackClassName = isStudent
+    ? "bg-[linear-gradient(135deg,_#0f766e,_#0891b2,_#0ea5e9)] text-white shadow-[0_8px_18px_rgba(14,165,233,0.3)]"
+    : "bg-primary text-primary-foreground";
+  const notificationBadgeClassName = isStudent
+    ? "bg-[#0ea5e9] text-white"
+    : "bg-primary text-white";
+  const getInitials = (value: string) =>
+    value
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase())
+      .join("");
+  const userInitials = getInitials(userName);
+
+  const layoutRootClassName = `min-h-screen flex w-full bg-background ${isStudent ? "student-theme-scope" : ""}`;
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className={layoutRootClassName}>
         {sidebar}
 
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="bg-card border-b border-border px-3 sm:px-6 py-3 sm:py-4">
+          <header className={`${headerClassName} px-3 sm:px-6 py-3 sm:py-4`}>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <SidebarTrigger />
@@ -100,7 +125,7 @@ export function Layout({ children }: LayoutProps) {
                     <input
                       type="text"
                       placeholder="Search resources, articles..."
-                      className="pl-10 pr-4 py-2 bg-muted rounded-lg border border-border w-52 lg:w-80 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className={searchInputClassName}
                     />
                   </div>
                 </div>
@@ -119,7 +144,7 @@ export function Layout({ children }: LayoutProps) {
                   >
                     <Bell className="w-5 h-5" />
                     {notifications.length > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-primary text-[10px] text-white rounded-full flex items-center justify-center">
+                      <span className={`absolute -top-1 -right-1 min-w-4 h-4 px-1 ${notificationBadgeClassName} text-[10px] rounded-full flex items-center justify-center`}>
                         {notifications.length > 9 ? "9+" : notifications.length}
                       </span>
                     )}
@@ -127,13 +152,13 @@ export function Layout({ children }: LayoutProps) {
 
                   {showNotifications && (
                     <div
-                      className="absolute right-0 mt-2 w-[92vw] sm:w-80 bg-white border border-gray-200 rounded-lg shadow-lg"
+                      className="absolute right-0 mt-2 w-[92vw] sm:w-80 bg-card border border-border rounded-lg shadow-lg"
                       style={{ zIndex: 9999 }}
                     >
-                      <div className="flex items-center justify-between px-4 py-2 border-b">
-                        <span className="font-semibold text-lg">Notifications</span>
+                      <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+                        <span className="font-semibold text-lg text-foreground">Notifications</span>
                         <button
-                          className="text-gray-500 hover:text-gray-700 text-lg font-bold"
+                          className="text-muted-foreground hover:text-foreground text-lg font-bold"
                           onClick={() => setShowNotifications(false)}
                           aria-label="Dismiss notifications"
                         >
@@ -142,18 +167,18 @@ export function Layout({ children }: LayoutProps) {
                       </div>
                       <ul className="max-h-60 overflow-y-auto">
                         {notifications.length === 0 ? (
-                          <li className="px-4 py-3 text-gray-500">No notifications</li>
+                          <li className="px-4 py-3 text-muted-foreground">No notifications</li>
                         ) : (
                           notifications.map((notification) => {
                             const id = notification._id || notification.id;
                             return (
                               <li
                                 key={id}
-                                className="px-4 py-3 border-b last:border-b-0 text-gray-700 flex justify-between items-start gap-3"
+                                className="px-4 py-3 border-b border-border last:border-b-0 text-foreground flex justify-between items-start gap-3"
                               >
                                 <span className="text-sm">{notification.message || notification.title || "Notification"}</span>
                                 <button
-                                  className="text-gray-400 hover:text-red-500 text-base font-bold"
+                                  className="text-muted-foreground hover:text-red-500 text-base font-bold"
                                   onClick={() => handleDismissNotification(id)}
                                   aria-label="Dismiss notification"
                                 >
@@ -171,15 +196,19 @@ export function Layout({ children }: LayoutProps) {
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">
-                      {localStorage.getItem("userName") || "User"}
+                      {userName}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {localStorage.getItem("userEmail") || "User"}
+                      {userEmail}
                     </p>
                   </div>
                   <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <User className="w-5 h-5" />
+                    <AvatarFallback className={avatarFallbackClassName}>
+                      {userInitials ? (
+                        <span className="text-sm font-semibold">{userInitials}</span>
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
                     </AvatarFallback>
                   </Avatar>
                 </div>

@@ -43,12 +43,12 @@ export default function AppHeader() {
         {/* Logo Section */}
         <div className="p-2">
           <div className="items-center gap-3">
-            <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-[linear-gradient(135deg,_#0f766e,_#0891b2,_#0ea5e9)] shadow-[0_8px_18px_rgba(14,165,233,0.3)] flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
 
             <div>
-              <h1 className="text-xl font-bold text-primary">Arogyam</h1>
+              <h1 className="text-xl font-bold text-[#0f766e]">Arogyam</h1>
               <p className="text-xs text-muted-foreground">Student Wellness</p>
             </div>
           </div>
@@ -57,31 +57,31 @@ export default function AppHeader() {
         <nav className="flex items-center gap-6">
           <a
             href="#"
-            className="px-4 py-1 rounded-lg bg-violet-100 text-violet-600 font-medium shadow"
+            className="px-4 py-1 rounded-lg bg-[#e8fbf6] text-[#0f766e] font-medium shadow"
           >
             Dashboard
           </a>
           <a
             href="#"
-            className="text-gray-600 hover:text-violet-600 font-medium"
+            className="text-gray-600 hover:text-[#0f766e] font-medium"
           >
             Resources
           </a>
           <a
             href="#"
-            className="text-gray-600 hover:text-violet-600 font-medium"
+            className="text-gray-600 hover:text-[#0f766e] font-medium"
           >
             Community
           </a>
           <a
             href="#"
-            className="text-gray-600 hover:text-violet-600 font-medium"
+            className="text-gray-600 hover:text-[#0f766e] font-medium"
           >
             Appointments
           </a>
           <a
             href="#"
-            className="text-gray-600 hover:text-violet-600 font-medium"
+            className="text-gray-600 hover:text-[#0f766e] font-medium"
           >
             Support
           </a>
@@ -94,7 +94,7 @@ export default function AppHeader() {
           <input
             type="text"
             placeholder="Search resources, articles"
-            className="pl-12 pr-4 py-2 rounded-lg border border-gray-200 w-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-violet-100"
+            className="pl-12 pr-4 py-2 rounded-lg border border-gray-200 w-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
           />
         </div>
       </div>
